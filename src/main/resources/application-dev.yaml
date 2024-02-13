@@ -1,0 +1,31 @@
+logging:
+  level:
+    io.r2dbc.postgresql.QUERY: DEBUG # for queries
+    io.r2dbc.postgresql.PARAM: DEBUG # for parameters
+    org:
+      springframework:
+        data:
+          r2dbc: DEBUG
+    web: DEBUG
+
+# ENVIRONMENT VARIABLES
+## SERVER
+SERVER_PORT: 8080
+POSTGRES_URL: localhost
+POSTGRES_PORT: 5432
+POSTGRES_DB: leasing
+POSTGRES_USER: dev
+POSTGRES_PASSWORD: example
+
+## APPLICATION
+HOST: http://localhost
+
+## JWT
+JWT_SECRET_KEY: ecf1222c-88fd-47f3-988f-bdd78bade1ad
+
+## AWS
+ACCOUNT_ACCESS_KEY_FROM_AWS: AKIA5FTZAQ7RECGYTJNF
+ACCOUNT_SECRET_KEY_FROM_AWS: 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
+S3_CONFIGURED_REGION_FROM_AWS: us-east-1
+S3_BUCKET_NAME: platform-leasing
+S3_ENDPOINT: https://platform-leasing.s3.amazonaws.com/

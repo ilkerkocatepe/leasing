@@ -1,0 +1,57 @@
+server:
+  port: ${SERVER_PORT}
+spring:
+  profiles:
+    active: ${spring-boot.run.profiles:prod}
+  r2dbc:
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    url: r2dbc:postgresql://${POSTGRES_URL}:${POSTGRES_PORT}
+    name: leasing
+  flyway:
+    url: jdbc:postgresql://${POSTGRES_URL}:${POSTGRES_PORT}/${POSTGRES_DB}
+    locations: classpath:db/postgres/migration
+    user: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  application:
+    name: leasing
+  webflux:
+    base-path: /api
+    problemdetails:
+      enabled: true
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+
+application:
+  version: ^project.version^
+com:
+  name: Leasing Exterior Platform Managing System
+  email: info@example.com
+  api:
+    host: ${HOST}:${SERVER_PORT}
+    doc:
+      title: ${com.name}
+      description: ${com.name} API Documentation
+
+springdoc:
+  swagger-ui:
+    path: swagger-ui.html
+    displayRequestDuration: true
+
+management:
+    endpoints:
+        web:
+          exposure:
+            include: "*"
+
+aws:
+  access-key: ${ACCOUNT_ACCESS_KEY_FROM_AWS}
+  secret-key: ${ACCOUNT_SECRET_KEY_FROM_AWS}
+  region: ${S3_CONFIGURED_REGION_FROM_AWS}
+  bucket-name: ${S3_BUCKET_NAME}
+  endpoint: ${S3_ENDPOINT}
+  multipart-min-part-size: 5242880 # 5MB
+  product-image-folder: ${aws.endpoint}${aws.bucket-name}/product/
+  product-category-image-folder: ${aws.endpoint}${aws.bucket-name}/product-category/
+  customer-image-folder: ${aws.endpoint}${aws.bucket-name}/customer/
