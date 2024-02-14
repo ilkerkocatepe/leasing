@@ -15,9 +15,9 @@
 	<description>Leasing Exterior Platform Managing System</description>
 	<properties>
 		<java.version>21</java.version>
-		<aws.java.sdk.version>2.23.14</aws.java.sdk.version>
+		<aws.java.sdk.version>2.24.2</aws.java.sdk.version>
 		<apache.commons.version>3.14.0</apache.commons.version>
-		<jjwt.version>0.12.4</jjwt.version>
+		<jjwt.version>0.12.5</jjwt.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<resource.delimiter>^</resource.delimiter>
 	</properties>
