@@ -16,7 +16,7 @@ FROM openjdk:21
 WORKDIR /app
 
 # Copy the built JAR from the build stage
-COPY --from=build /app/target/*-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/leasing.jar app.jar
 
 # Expose the port that the Spring Boot app will run on
 EXPOSE 8080
