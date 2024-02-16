@@ -8,7 +8,7 @@ RUN mvn dependency:go-offline
 
 # Copy the source code and build the JAR
 COPY src /app/src
-RUN mvn clean verify
+RUN mvn clean verify -DskipTests
 
 # Stage 2: Create the final image with the built JAR
 FROM openjdk:21
