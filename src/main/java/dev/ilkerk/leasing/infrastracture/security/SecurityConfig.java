@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .anyExchange().authenticated()
                 )
                 .cors(ServerHttpSecurity.CorsSpec::disable)
-                .addFilterAt(corsWebFilter, SecurityWebFiltersOrder.CORS)
+                //.addFilterAt(corsWebFilter, SecurityWebFiltersOrder.CORS)
                 .addFilterAt(new JwtTokenAuthenticationFilter(tokenProvider), SecurityWebFiltersOrder.HTTP_BASIC)
                 .logout((logout) -> logout
                         .logoutUrl("auth/logout")
