@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.DELETE).hasRole(Role.ADMIN.toString())
                         .anyExchange().authenticated()
                 )
+                .cors(ServerHttpSecurity.CorsSpec::disable)
                 .addFilterAt(corsWebFilter, SecurityWebFiltersOrder.CORS)
                 .addFilterAt(new JwtTokenAuthenticationFilter(tokenProvider), SecurityWebFiltersOrder.HTTP_BASIC)
                 .logout((logout) -> logout
