@@ -13,7 +13,7 @@ public class CorsConfig {
     @Bean
     CorsWebFilter corsWebFilter() {
         var corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200"));
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200", "http://dev.ilkerkocatepe.com.tr"));
         corsConfiguration.setAllowedMethods(List.of("*"));
         corsConfiguration.setAllowedHeaders(List.of("content-type", "Access-Control-Request-Method", "Access-Control-Request-Headers", "Access-Control-Allow-Origin"));
         corsConfiguration.setAllowCredentials(true);
