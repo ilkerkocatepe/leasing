@@ -12,7 +12,7 @@ public class CookieConfig {
         CookieWebSessionIdResolver resolver = new CookieWebSessionIdResolver();
         resolver.setCookieName("JSESSIONID");
         resolver.addCookieInitializer((builder) -> builder.path("/"));
-        resolver.addCookieInitializer((builder) -> builder.sameSite("Lax"));
+        resolver.addCookieInitializer((builder) -> builder.sameSite("None"));
         resolver.addCookieInitializer((builder) -> builder.secure(true));
         resolver.addCookieInitializer((builder) -> builder.maxAge(7 * 24 * 60 * 60)); // expires in 7 days
         resolver.addCookieInitializer((builder) -> builder.httpOnly(true));
