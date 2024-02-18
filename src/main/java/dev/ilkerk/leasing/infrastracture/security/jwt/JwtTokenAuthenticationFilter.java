@@ -23,7 +23,7 @@ public class JwtTokenAuthenticationFilter implements WebFilter {
             }
 
             String token = session.getAttributes().get("token").toString();
-            log.info("Session token: {}", token);
+            log.debug("Session token: {}", token);
 
             if (StringUtils.hasText(token) && this.tokenProvider.validateToken(token)) {
                 return Mono.fromCallable(() -> this.tokenProvider.getAuthentication(token))
