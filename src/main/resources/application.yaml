@@ -1,7 +1,7 @@
 server:
   port: ${SERVER_PORT}
   time-zone: UTC+3
-  locale: tr-TR
+  locale: en-US
 spring:
   profiles:
     active: ${spring-boot.run.profiles:prod}
