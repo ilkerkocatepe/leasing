@@ -1,6 +1,6 @@
 server:
   port: ${SERVER_PORT}
-  time-zone: GMT+3
+  time-zone: Europe/Istanbul
   locale: en-US
 spring:
   profiles:
