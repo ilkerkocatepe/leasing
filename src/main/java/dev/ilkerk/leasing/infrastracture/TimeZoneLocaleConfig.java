@@ -1,5 +1,6 @@
 package dev.ilkerk.leasing.infrastracture;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -12,6 +13,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 @Component
+@Slf4j
 public class TimeZoneLocaleConfig implements BeanFactoryPostProcessor, EnvironmentAware, Ordered {
     private Environment env;
 
@@ -23,6 +25,8 @@ public class TimeZoneLocaleConfig implements BeanFactoryPostProcessor, Environme
         Locale.setDefault(
                 Locale.forLanguageTag(env.getProperty("server.locale", "en-US"))
         );
+        log.info("TimeZone: {}", TimeZone.getDefault().toString());
+        log.info("Locale: {}", Locale.getDefault().toString());
     }
 
     @Override
