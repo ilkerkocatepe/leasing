@@ -3,7 +3,6 @@ package dev.ilkerk.leasing.infrastracture.security.jwt;
 import dev.ilkerk.leasing.application.user.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -90,15 +89,14 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            log.info("validateToken: {}", token);
+            log.debug("validateToken: {}", token);
             Jws<Claims> claims = Jwts.parser().verifyWith(this.secretKey)
                     .build().parseSignedClaims(token);
             // parseClaimsJws will check expiration date. No need do here.
-            log.info("expiration date: {}", claims.getPayload().getExpiration());
+            log.debug("expiration date: {}", claims.getPayload().getExpiration());
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            log.info("Invalid JWT token: {}", e.getMessage());
-            log.trace("Invalid JWT token trace.", e);
+        } catch (Exception e) {
+            log.error("Invalid JWT token", e);
         }
         return false;
     }
