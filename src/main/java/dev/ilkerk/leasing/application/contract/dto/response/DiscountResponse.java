@@ -1,7 +1,5 @@
 package dev.ilkerk.leasing.application.contract.dto.response;
 
-import dev.ilkerk.leasing.application.product.dto.response.ProductResponse;
-import dev.ilkerk.leasing.domain.contract.entity.TransportType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,15 +12,14 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionResponse {
+public class DiscountResponse {
     private UUID id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String receiptNumber;
-    private TransportType type;
+    private String modifiedBy;
     private Double amount;
+    private Double beforeAmount;
+    private Double afterAmount;
     private String description;
-    private LocalDateTime issueDate;
-    private ProductResponse product;
-    private UUID productId;
+    private UUID allowanceId;
 }

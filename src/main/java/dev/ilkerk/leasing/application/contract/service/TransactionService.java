@@ -17,10 +17,11 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -29,10 +30,6 @@ public class TransactionService {
 	private final TransactionRepository transactionRepository;
 	private final ModelMapper modelMapper;
 	private final ProductService productService;
-
-	private Mono<Transaction> getObject(UUID id) {
-		return transactionRepository.findById(id);
-	}
 
 	public Mono<TransactionResponse> get(UUID id) {
 		return this.getObject(id)
@@ -43,6 +40,10 @@ public class TransactionService {
 
 							return Mono.just(transactionResponse);
 						}));
+	}
+
+	private Mono<Transaction> getObject(UUID id) {
+		return transactionRepository.findById(id);
 	}
 
 	public Flux<TransactionResponse> getAllByCriteria(TransactionFindDTO transactionFindDTO) {
@@ -149,7 +150,7 @@ public class TransactionService {
 
 		return this.getObject(id)
 				.map(Optional::of)
-				.switchIfEmpty(Mono.error(new Exception("Transaction not found")))
+				.switchIfEmpty(Mono.error(new RuntimeException("Transaction not found")))
 				.flatMap(optionalTransaction -> {
 					if (optionalTransaction.isPresent()) {
 						Transaction updatedTransaction = this.getUpdatedTransaction(optionalTransaction.get(), transactionCreateDTO);
@@ -184,12 +185,8 @@ public class TransactionService {
 			transaction.setDescription(transactionCreateDTO.getDescription());
 		}
 
-		if (transactionCreateDTO.getStartAt() != null) {
-			transaction.setStartAt(transactionCreateDTO.getStartAt());
-		}
-
-		if (transactionCreateDTO.getEndAt() != null) {
-			transaction.setEndAt(transactionCreateDTO.getEndAt());
+		if (transactionCreateDTO.getIssueDate() != null) {
+			transaction.setIssueDate(transactionCreateDTO.getIssueDate());
 		}
 
 		if (transactionCreateDTO.getContractId() != null) {
@@ -225,5 +222,44 @@ public class TransactionService {
 				}
 			});
 		}
+	}
+
+	public Mono<Map<UUID, Double>> calculateTransactions(UUID contractId, LocalDateTime startTime, LocalDateTime endTime) {
+		AtomicReference<Map<UUID, Double>> transactionsWithAmount = new AtomicReference<>(new HashMap<>());
+		return this.transactionRepository
+				.findAllByContractId(contractId)
+				.filter(transaction -> transaction.getIssueDate().isAfter(startTime))
+				.concatMap(transaction -> {
+					log.info("Transaction: " + transaction.toString());
+					return productService.get(transaction.getProductId())
+							.map(productResponse -> {
+								log.info("ProductResponse: " + productResponse.toString());
+								if (productResponse.getFactor().compareTo(1.0) > 0) {
+									double amount = transaction.getAmount() * productResponse.getFactor(); // amount * factor
+									log.info("Amount1: " + amount);
+
+									double days = ChronoUnit.DAYS.between(transaction.getIssueDate(), endTime);
+									log.info("days: " + days);
+
+									amount = amount * days;
+									log.info("Amount2: " + amount);
+
+									if (transaction.getType().equals(TransportType.INBOUND)) {
+										amount = amount * -1;
+									}
+									log.info("Amount3: " + amount);
+
+									double totalAmount = transactionsWithAmount.get().get(transaction.getProductId()) == null ? 0 : transactionsWithAmount.get().get(transaction.getProductId());
+									transactionsWithAmount.get().put(transaction.getProductId(), amount + totalAmount);
+
+									log.info("transactionsWithAmount.get(): " + transactionsWithAmount.get());
+
+									return transactionsWithAmount.get();
+								}
+								return transactionsWithAmount.get();
+							});
+				})
+				.collect(Collectors.toList())
+				.flatMap(transactions -> Mono.just(transactionsWithAmount.get()));
 	}
 }

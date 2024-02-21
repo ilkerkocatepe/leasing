@@ -145,8 +145,7 @@ CREATE TABLE if not exists transactions
     type           VARCHAR(255) CHECK (type IN ('INBOUND', 'OUTBOUND')),
     amount         DECIMAL   NOT NULL,
     description    VARCHAR(255),
-    start_at       TIMESTAMP NOT NULL,
-    end_at         TIMESTAMP,
+    issue_date     TIMESTAMP NOT NULL,
     contract_id    UUID      NOT NULL REFERENCES contracts (id) ON DELETE CASCADE,
     product_id     UUID      NOT NULL REFERENCES products (id)
 );
@@ -201,6 +200,44 @@ CREATE TABLE if not exists system_settings
     updated_at TIMESTAMP    NOT NULL DEFAULT NOW(),
     key        VARCHAR(255) NOT NULL,
     value      VARCHAR(255)
+);
+
+CREATE TABLE if not exists allowances
+(
+    id          UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
+    created_at  TIMESTAMP    NOT NULL,
+    updated_at  TIMESTAMP    NOT NULL DEFAULT NOW(),
+    modified_by VARCHAR(255) NOT NULL,
+    amount      DECIMAL,
+    is_paid     BOOLEAN      NOT NULL DEFAULT FALSE,
+    description VARCHAR(255),
+    start_time  TIMESTAMP    NOT NULL DEFAULT NOW(),
+    end_time    TIMESTAMP    NOT NULL DEFAULT NOW(),
+    contract_id UUID         NOT NULL REFERENCES contracts (id)
+);
+
+CREATE TABLE if not exists discounts
+(
+    id            UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
+    created_at    TIMESTAMP    NOT NULL,
+    updated_at    TIMESTAMP    NOT NULL DEFAULT NOW(),
+    modified_by   VARCHAR(255) NOT NULL,
+    amount        DECIMAL,
+    before_amount DECIMAL,
+    after_amount  DECIMAL,
+    description   VARCHAR(255),
+    allowance_id  UUID         NOT NULL REFERENCES allowances (id)
+);
+
+CREATE TABLE if not exists invoices
+(
+    id           UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
+    created_at   TIMESTAMP    NOT NULL,
+    updated_at   TIMESTAMP    NOT NULL DEFAULT NOW(),
+    serial       VARCHAR(255) NOT NULL,
+    amount       DECIMAL      NOT NULL,
+    description  VARCHAR(255),
+    allowance_id UUID         NOT NULL REFERENCES allowances (id)
 );
 
 -- SQL KEY WORDS: https://www.postgresql.org/docs/current/sql-keywords-appendix.html

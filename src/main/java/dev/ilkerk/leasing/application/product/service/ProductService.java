@@ -46,11 +46,12 @@ public class ProductService {
                         productResponse.setImageUrl(bucketImageFolder + productResponse.getImage());
                     }
 
-                    return Mono.just(productResponse).flatMap(productResponse1 -> stockService.getByProductId(product.getId()).defaultIfEmpty(new StockResponse()).flatMap(stockResponse -> {
-                        productResponse1.setStock(stockResponse);
+                    return Mono.just(productResponse)
+                            .flatMap(productResponse1 -> stockService.getByProductId(product.getId()).defaultIfEmpty(new StockResponse()).flatMap(stockResponse -> {
+                                productResponse1.setStock(stockResponse);
 
-                        return Mono.just(productResponse1);
-                    }));
+                                return Mono.just(productResponse1);
+                            }));
                 });
     }
 
@@ -88,7 +89,7 @@ public class ProductService {
         String customerId = userService.getUserIdAndCustomerId(authentication).get("customerId");
 
         Product product = modelMapper.map(productCreateDTO, Product.class);
-		product.setCustomerId(UUID.fromString(customerId));
+        product.setCustomerId(UUID.fromString(customerId));
 
         log.debug("Created product object: " + product);
 

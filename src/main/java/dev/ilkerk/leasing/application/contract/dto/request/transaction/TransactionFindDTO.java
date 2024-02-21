@@ -24,8 +24,7 @@ public class TransactionFindDTO {
 	private TransportType type;
 	private Double amount;
 	private String description;
-	private LocalDateTime startAt;
-	private LocalDateTime endAt;
+	private LocalDateTime issueDate;
 	private UUID contractId;
 	private UUID productId;
 
@@ -36,8 +35,7 @@ public class TransactionFindDTO {
 				.withMatcher("type", exact())
 				.withMatcher("amount", exact())
 				.withMatcher("description", contains().stringMatcher(ExampleMatcher.StringMatcher.CONTAINING).ignoreCase())
-				.withMatcher("startAt", exact())
-				.withMatcher("endAt", exact())
+				.withMatcher("issueDate", exact())
 				.withMatcher("contractId", exact())
 				.withMatcher("productId", exact());
 	}

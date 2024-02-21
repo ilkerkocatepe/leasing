@@ -1,36 +1,36 @@
-package dev.ilkerk.leasing.domain.contract.entity;
+package dev.ilkerk.leasing.application.contract.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-@Table("allowances")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Allowance {
-    @Id
+public class AllowanceResponse {
     private UUID id;
-    @CreatedDate
     private LocalDateTime createdAt;
-    @LastModifiedDate
     private LocalDateTime updatedAt;
-    @LastModifiedBy
     private String modifiedBy;
     private Double amount;
     private Boolean isPaid;
     private String description;
+    private Double specialAreaPrice;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private UUID contractId;
+    private UUID discountId;
+    private UUID invoiceId;
+    private ContractResponse contract;
+    private List<TransactionResponse> transactions;
+    private Map<String, Double> products = new HashMap<>();
+    private DiscountResponse discount;
 }

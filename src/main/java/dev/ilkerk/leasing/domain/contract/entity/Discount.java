@@ -6,29 +6,30 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Table("transactions")
+@Table("discounts")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Transaction {
+public class Discount {
     @Id
     private UUID id;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updatedAt;
-    private String receiptNumber;
-    private TransportType type;
+    @LastModifiedBy
+    private String modifiedBy;
     private Double amount;
+    private Double beforeAmount;
+    private Double afterAmount;
     private String description;
-    private LocalDateTime issueDate;
-    private UUID contractId;
-    private UUID productId;
+    private UUID allowanceId;
 }

@@ -19,8 +19,7 @@ public class TransactionUpdateDTO {
 	private TransportType type;
 	private Double amount;
 	private String description;
-	private LocalDateTime startAt;
-	private LocalDateTime endAt;
+	private LocalDateTime issueDate;
 	private UUID contractId;
 	private UUID productId;
 }

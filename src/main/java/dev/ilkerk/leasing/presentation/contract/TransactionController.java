@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -86,5 +88,10 @@ public class TransactionController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public Mono<Void> delete(@PathVariable UUID id) {
 		return transactionService.deleteById(id);
+	}
+
+	@GetMapping("calculate")
+	public Mono<Map<UUID, Double>> calculate(@RequestParam UUID contractId) {
+		return transactionService.calculateTransactions(contractId, LocalDateTime.of(2024, 1, 1, 0, 0), LocalDateTime.now());
 	}
 }
