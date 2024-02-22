@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Example;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,6 +27,7 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final ModelMapper modelMapper;
 	private final CustomerUsersService customerUsersService;
+	private final PasswordEncoder passwordEncoder;
 
 	public Mono<UserResponse> get(UUID id) {
 		return userRepository.findById(id)
@@ -49,8 +51,9 @@ public class UserService {
 		log.info("User creating: " + userCreateDTO.toString());
 
 		User user = modelMapper.map(userCreateDTO, User.class);
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-		log.debug("Created user object: " + user);
+		log.info("Created user object: " + user);
 
 		return userRepository.save(user)
 				.flatMap(user1 -> Mono.just(modelMapper.map(user1, UserResponse.class)))
@@ -68,7 +71,7 @@ public class UserService {
 				.flatMap(optionalUser -> {
 					if (optionalUser.isPresent()) {
 						User updatedUser = this.getUpdatedUser(optionalUser.get(), userCreateDTO);
-
+						updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
 						log.info("Updated user object: " + updatedUser);
 
 						return userRepository.save(updatedUser);

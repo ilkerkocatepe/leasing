@@ -5,7 +5,6 @@ Leasing/Renting outdoor platforms like scaffolding systems.
 - [ ] Stock update after transaction ~1d #feature @ilker
 - [ ] Contract note type ~1h #feature @ilker
 - [ ] Soft delete implementation ~1d #feature @ilker
-- [ ] Customer for user ~1d #feature @ilker
 - [ ] Remove unnecessary endpoints ~1d #feature @ilker
 - [ ] Statistic endpoints ~1d #feature @ilker
 - [ ] BaseResponse ~1d #feature @ilker
@@ -14,6 +13,7 @@ Leasing/Renting outdoor platforms like scaffolding systems.
 - [ ] Allowance
 
 ### Done ✓
+- [x] Customer for user ~1d #feature @ilker
 - [x] PROD settings, CORS etc. ~1d #feature @ilker
 - [x] Jenkins pipeline ~1d #feature @ilker
 - [x] Contract features ~2d #feature @ilker

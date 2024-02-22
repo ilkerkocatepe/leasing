@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -131,7 +132,7 @@ public class CustomerService {
                     UserCreateDTO userCreateDTO = modelMapper.map(customerCreateDTO.getUser(), UserCreateDTO.class);
                     userCreateDTO.setCustomerId(customerResponse.getId());
                     userCreateDTO.setActive(Boolean.TRUE);
-                    userCreateDTO.getRoles().add(Role.CUSTOMER);
+                    userCreateDTO.setRoles(List.of(Role.CUSTOMER));
 
                     return userService.create(userCreateDTO)
                             .flatMap(userResponse -> {
