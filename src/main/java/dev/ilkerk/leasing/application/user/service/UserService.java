@@ -3,6 +3,7 @@ package dev.ilkerk.leasing.application.user.service;
 import dev.ilkerk.leasing.application.user.dto.request.user.UserCreateDTO;
 import dev.ilkerk.leasing.application.user.dto.request.user.UserFindDTO;
 import dev.ilkerk.leasing.application.user.dto.response.UserResponse;
+import dev.ilkerk.leasing.domain.user.entity.CustomerUsers;
 import dev.ilkerk.leasing.domain.user.entity.User;
 import dev.ilkerk.leasing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,10 @@ public class UserService {
 		log.debug("Created user object: " + user);
 
 		return userRepository.save(user)
-				.flatMap(user1 -> Mono.just(modelMapper.map(user1, UserResponse.class)));
+				.flatMap(user1 -> Mono.just(modelMapper.map(user1, UserResponse.class)))
+				.flatMap(userResponse -> customerUsersService.create(new CustomerUsers(userCreateDTO.getCustomerId(), userResponse.getId()))
+						.flatMap(customerUser -> Mono.just(userResponse))
+				);
 	}
 
 	public Mono<UserResponse> update(UUID id, UserCreateDTO userCreateDTO) {
@@ -83,10 +87,6 @@ public class UserService {
 			user.setEmail(userCreateDTO.getEmail());
 		}
 
-		if (userCreateDTO.getUsername() != null) {
-			user.setUsername(userCreateDTO.getUsername());
-		}
-
 		if (userCreateDTO.getPassword() != null) {
 			user.setPassword(userCreateDTO.getPassword());
 		}
@@ -108,13 +108,13 @@ public class UserService {
 		return userRepository.deleteById(id);
 	}
 
-	public Mono<UUID> findCustomerIdByUsername(String username) {
-		return userRepository.findByUsername(username)
+	public Mono<UUID> findCustomerIdByEmail(String email) {
+		return userRepository.findByEmail(email)
 				.flatMap(user -> customerUsersService.findCustomerIdByUserId(user.getId()).flatMap(Mono::just));
 	}
 
-	public Mono<UUID> findUserIdByUsername(String username) {
-		return userRepository.findByUsername(username).flatMap(user -> Mono.just(user.getId()));
+	public Mono<UUID> findUserIdByEmail(String email) {
+		return userRepository.findByEmail(email).flatMap(user -> Mono.just(user.getId()));
 	}
 
 	public Map<String, String> getUserIdAndCustomerId(Authentication authentication) {

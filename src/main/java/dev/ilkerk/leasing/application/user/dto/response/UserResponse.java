@@ -18,9 +18,8 @@ public class UserResponse {
     private UUID id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String username;
     private String name;
     private String email;
-    private boolean active;
+    private Boolean active;
     private List<Role> roles;
 }

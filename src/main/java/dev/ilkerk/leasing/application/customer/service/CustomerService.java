@@ -5,8 +5,11 @@ import dev.ilkerk.leasing.application.customer.dto.request.customer.CustomerFind
 import dev.ilkerk.leasing.application.customer.dto.request.customer.CustomerWithAddressCreateDTO;
 import dev.ilkerk.leasing.application.customer.dto.response.AddressResponse;
 import dev.ilkerk.leasing.application.customer.dto.response.CustomerResponse;
+import dev.ilkerk.leasing.application.user.dto.request.user.UserCreateDTO;
+import dev.ilkerk.leasing.application.user.service.UserService;
 import dev.ilkerk.leasing.domain.customer.entity.Customer;
 import dev.ilkerk.leasing.domain.customer.repository.CustomerRepository;
+import dev.ilkerk.leasing.domain.user.entity.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -27,6 +30,7 @@ public class CustomerService {
     private final ModelMapper modelMapper;
     private final AddressService addressService;
     private final CustomerPreferenceService customerPreferenceService;
+    private final UserService userService;
 
     @Value("${aws.customer-image-folder}")
     private String bucketImageFolder;
@@ -122,7 +126,20 @@ public class CustomerService {
                     });
 
                     return Mono.just(customerResponse);
-                }));
+                }))
+                .flatMap(customerResponse -> {
+                    UserCreateDTO userCreateDTO = modelMapper.map(customerCreateDTO.getUser(), UserCreateDTO.class);
+                    userCreateDTO.setCustomerId(customerResponse.getId());
+                    userCreateDTO.setActive(Boolean.TRUE);
+                    userCreateDTO.getRoles().add(Role.CUSTOMER);
+
+                    return userService.create(userCreateDTO)
+                            .flatMap(userResponse -> {
+                                customerResponse.setUser(userResponse);
+
+                                return Mono.just(customerResponse);
+                            });
+                });
     }
 
     public Mono<CustomerResponse> createWithAddress(CustomerWithAddressCreateDTO customerWithAddressCreateDTO) {
@@ -130,27 +147,21 @@ public class CustomerService {
 
         CustomerCreateDTO customerCreateDTO = modelMapper.map(customerWithAddressCreateDTO, CustomerCreateDTO.class);
 
-        try {
-            return this.create(customerCreateDTO)
-                    .flatMap(customerResponse -> {
-                        if (customerResponse.getLogo() != null) {
-                            customerResponse.setLogoUrl(bucketImageFolder + customerResponse.getLogo());
-                        }
+        return this.create(customerCreateDTO)
+                .flatMap(customerResponse -> {
+                    if (customerResponse.getLogo() != null) {
+                        customerResponse.setLogoUrl(bucketImageFolder + customerResponse.getLogo());
+                    }
 
-                        customerWithAddressCreateDTO.getAddress().setCustomerId(customerResponse.getId());
+                    customerWithAddressCreateDTO.getAddress().setCustomerId(customerResponse.getId());
 
-                        return addressService.create(customerWithAddressCreateDTO.getAddress())
-                                .flatMap(addressResponse -> {
-                                    customerResponse.getAddressList().add(addressResponse);
+                    return addressService.create(customerWithAddressCreateDTO.getAddress())
+                            .flatMap(addressResponse -> {
+                                customerResponse.getAddressList().add(addressResponse);
 
-                                    return Mono.just(customerResponse);
-                                });
-                    });
-        } catch (Exception e) {
-            log.error("createWithAddress exception", e);
-
-            throw new RuntimeException();
-        }
+                                return Mono.just(customerResponse);
+                            });
+                });
     }
 
     public Mono<CustomerResponse> update(UUID id, CustomerCreateDTO customerCreateDTO) {

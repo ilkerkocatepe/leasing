@@ -1,5 +1,6 @@
 package dev.ilkerk.leasing.application.customer.dto.response;
 
+import dev.ilkerk.leasing.application.user.dto.response.UserResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,4 +26,5 @@ public class CustomerResponse {
     private String phoneNumber;
     private List<AddressResponse> addressList = new ArrayList<>();
     private Map<String, String> customerPreferences = new HashMap<>();
+    private UserResponse user;
 }

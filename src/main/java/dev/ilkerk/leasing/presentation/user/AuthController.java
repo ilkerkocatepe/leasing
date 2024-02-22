@@ -32,7 +32,7 @@ public class AuthController {
         return authRequest
                 .flatMap(login -> this.authenticationManager
                         .authenticate(new UsernamePasswordAuthenticationToken(
-                                login.username(), login.password()))
+                                login.email(), login.password()))
                         .map(authentication -> tokenProvider.createToken(authentication))
                         .flatMap(jwt -> {
                             session.getAttributes().put("token", jwt);

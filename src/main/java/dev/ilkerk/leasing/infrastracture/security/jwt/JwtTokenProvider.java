@@ -46,16 +46,16 @@ public class JwtTokenProvider {
     }
 
     public String createToken(Authentication authentication) {
-        String username = authentication.getName();
+        String email = authentication.getName();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        var claimsBuilder = Jwts.claims().subject(username);
+        var claimsBuilder = Jwts.claims().subject(email);
         if (!authorities.isEmpty()) {
             claimsBuilder.add(AUTHORITIES_KEY, authorities.stream()
                     .map(GrantedAuthority::getAuthority).collect(joining(",")));
         }
 
-        claimsBuilder.add(CUSTOMER_ID_KEY, userService.findCustomerIdByUsername(username).toFuture().join().toString());
-        claimsBuilder.add(USER_ID_KEY, userService.findUserIdByUsername(username).toFuture().join().toString());
+        claimsBuilder.add(CUSTOMER_ID_KEY, userService.findCustomerIdByEmail(email).toFuture().join().toString());
+        claimsBuilder.add(USER_ID_KEY, userService.findUserIdByEmail(email).toFuture().join().toString());
 
         var claims = claimsBuilder.build();
 

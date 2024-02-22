@@ -28,7 +28,6 @@ public class User {
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updatedAt;
-    private String username;
     private String name;
     @Email
     private String email;
