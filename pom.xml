@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.2</version>
+		<version>3.2.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>dev.ilkerk</groupId>
@@ -15,9 +15,9 @@
 	<description>Leasing Exterior Platform Managing System</description>
 	<properties>
 		<java.version>21</java.version>
-		<aws.java.sdk.version>2.24.2</aws.java.sdk.version>
-		<apache.commons.version>3.14.0</apache.commons.version>
 		<jjwt.version>0.12.5</jjwt.version>
+		<aws.java.sdk.version>2.24.7</aws.java.sdk.version>
+		<apache.commons.version>3.14.0</apache.commons.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<resource.delimiter>^</resource.delimiter>
 	</properties>
