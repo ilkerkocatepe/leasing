@@ -1,7 +1,7 @@
 package dev.ilkerk.leasing.application.customer.dto.request.customer;
 
 import dev.ilkerk.leasing.application.customer.dto.request.address.AddressCreateDTO;
-import jakarta.validation.constraints.Email;
+import dev.ilkerk.leasing.application.user.dto.request.user.UserCreateDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +18,6 @@ public class CustomerWithAddressCreateDTO {
 	private String taxAdministration;
 	private String mersisNumber;
 	private String phoneNumber;
-	@Email
-	private String email;
 	private AddressCreateDTO address;
+	private UserCreateDTO user;
 }
