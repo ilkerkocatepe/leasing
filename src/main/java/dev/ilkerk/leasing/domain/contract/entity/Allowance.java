@@ -27,6 +27,7 @@ public class Allowance {
     private LocalDateTime updatedAt;
     @LastModifiedBy
     private String modifiedBy;
+    private String serialNumber;
     private Double amount;
     private Boolean isPaid;
     private String description;

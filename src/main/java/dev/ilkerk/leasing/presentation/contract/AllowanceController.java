@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -68,5 +69,17 @@ public class AllowanceController {
     @ResponseStatus(HttpStatus.OK)
     public Mono<AllowanceResponse> previewContract(@RequestBody AllowanceCreate allowanceCreate) {
         return allowanceService.preview(allowanceCreate);
+    }
+
+    @GetMapping("html")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<String> html(@RequestParam UUID id) {
+        return allowanceService.html(id);
+    }
+
+    @GetMapping("download")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<ResponseEntity<byte[]>> download(@RequestParam UUID id) {
+        return allowanceService.download(id);
     }
 }

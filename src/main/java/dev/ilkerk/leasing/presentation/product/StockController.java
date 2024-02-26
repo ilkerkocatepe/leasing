@@ -59,7 +59,7 @@ public class StockController {
 
 	/*@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Mono<StockResponse> create(@RequestBody @Valid StockUpdateDTO stockUpdateDTO) {
+	templates Mono<StockResponse> create(@RequestBody @Valid StockUpdateDTO stockUpdateDTO) {
 		try {
 			return stockService.create(stockUpdateDTO);
 		} catch (Exception e) {
@@ -83,7 +83,7 @@ public class StockController {
 
 	/*@DeleteMapping("{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public Mono<Void> delete(@PathVariable UUID id) {
+	templates Mono<Void> delete(@PathVariable UUID id) {
 		return stockService.deleteById(id);
 	}*/
 }

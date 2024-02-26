@@ -1,22 +1,35 @@
 package dev.ilkerk.leasing.application.contract.service;
 
+import com.itextpdf.html2pdf.HtmlConverter;
 import dev.ilkerk.leasing.application.contract.dto.request.contract.AllowanceCreate;
 import dev.ilkerk.leasing.application.contract.dto.request.contract.AllowanceFind;
 import dev.ilkerk.leasing.application.contract.dto.response.AllowanceResponse;
+import dev.ilkerk.leasing.application.contract.dto.response.html.AllowanceHtml;
+import dev.ilkerk.leasing.application.contract.dto.response.html.ConditionsHtml;
+import dev.ilkerk.leasing.application.contract.dto.response.html.TransactionsHtml;
+import dev.ilkerk.leasing.application.customer.dto.response.AddressResponse;
 import dev.ilkerk.leasing.application.product.service.ProductService;
 import dev.ilkerk.leasing.domain.contract.entity.Allowance;
 import dev.ilkerk.leasing.domain.contract.repository.AllowanceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.internal.bytebuddy.utility.RandomString;
 import org.springframework.data.domain.Example;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringWebFluxTemplateEngine;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.ByteArrayOutputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -28,10 +41,27 @@ public class AllowanceService {
     private final ContractService contractService;
     private final TransactionService transactionService;
     private final ProductService productService;
+    private final SpringWebFluxTemplateEngine templateEngine;
 
     public Mono<AllowanceResponse> get(UUID id) {
         return allowanceRepository.findById(id)
-                .flatMap(allowance -> Mono.just(modelMapper.map(allowance, AllowanceResponse.class)));
+                .flatMap(allowance -> Mono.just(modelMapper.map(allowance, AllowanceResponse.class)))
+                .flatMap(allowanceResponse -> {
+                    return contractService.get(allowanceResponse.getContractId()).flatMap(contractResponse -> {
+                        allowanceResponse.setContract(contractResponse);
+                        return Mono.just(allowanceResponse);
+                    });
+                })
+                .flatMap(allowanceResponse -> {
+                    if (allowanceResponse.getDiscountId() == null) {
+                        return Mono.just(allowanceResponse);
+                    }
+
+                    return discountService.get(allowanceResponse.getDiscountId()).flatMap(discountResponse -> {
+                        allowanceResponse.setDiscount(discountResponse);
+                        return Mono.just(allowanceResponse);
+                    });
+                });
     }
 
     public Mono<Allowance> getObject(UUID id) {
@@ -62,6 +92,7 @@ public class AllowanceService {
                     Allowance allowance = modelMapper.map(allowanceCreate, Allowance.class);
                     allowance.setModifiedBy(modifiedBy);
                     allowance.setAmount(allowanceResponse.getAmount());
+                    allowance.setSerialNumber("TEST" + RandomString.make(6));
 
                     log.info("Allowance mapped: " + allowance);
 
@@ -137,6 +168,30 @@ public class AllowanceService {
                 });
     }
 
+    private Mono<AllowanceHtml> getForHtml(UUID allowanceId) {
+        return this.get(allowanceId).flatMap(allowanceResponse -> {
+            AllowanceHtml allowanceHtml = new AllowanceHtml();
+            allowanceHtml.setDate(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+            allowanceHtml.setLogo(allowanceResponse.getContract().getSellerCustomer().getLogo());
+            allowanceHtml.setDealerTitle(allowanceResponse.getContract().getSellerCustomer().getTitle());
+            allowanceHtml.setSerialNumber(allowanceResponse.getSerialNumber());
+            allowanceHtml.setStartTime(allowanceResponse.getStartTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+            allowanceHtml.setEndTime(allowanceResponse.getEndTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+            allowanceHtml.setDealerAddress(allowanceResponse.getContract().getSellerCustomer().getAddressList().stream().filter(AddressResponse::getIsMain).findFirst().get().getCity());
+            allowanceHtml.setDealerPhoneNumber(allowanceResponse.getContract().getSellerCustomer().getPhoneNumber());
+            allowanceHtml.setDealerEmail("");
+            allowanceHtml.setCustomerTitle(allowanceResponse.getContract().getTakerCustomer().getTitle());
+            allowanceHtml.setCustomerAddress(allowanceResponse.getContract().getTakerCustomer().getAddressList().stream().filter(AddressResponse::getIsMain).findFirst().get().getCity());
+            allowanceHtml.setCustomerPhoneNumber(allowanceResponse.getContract().getTakerCustomer().getPhoneNumber());
+            allowanceHtml.setCustomerEmail("");
+            allowanceHtml.setConditions(ConditionsHtml.from(Map.of("Günlük m2 Fiyatı", String.valueOf(allowanceResponse.getSpecialAreaPrice()))));
+            allowanceHtml.setTransactions(TransactionsHtml.from(allowanceResponse.getTransactions()));
+            allowanceHtml.setTotalAmount(allowanceResponse.getAmount().toString());
+
+            return Mono.just(allowanceHtml);
+        });
+    }
+
     public Mono<AllowanceResponse> update(UUID id, AllowanceCreate allowanceCreate) {
         log.info("Allowance updating: " + allowanceCreate.toString());
 
@@ -165,5 +220,36 @@ public class AllowanceService {
         log.info("Allowance deleting: " + id);
 
         return allowanceRepository.deleteById(id);
+    }
+
+    public Mono<String> html(UUID allowanceId) {
+        return this.getForHtml(allowanceId)
+                .flatMap(
+                        allowanceHtml -> {
+                            Context context = new Context(Locale.of("tr_TR"), Map.of("allowance", allowanceHtml));
+                            String html = templateEngine.process("allowance", context);
+                            return Mono.just(html);
+                        }
+                );
+    }
+
+    public Mono<ResponseEntity<byte[]>> download(UUID allowanceId) {
+        return this.getForHtml(allowanceId)
+                .flatMap(
+                        allowanceHtml -> {
+                            Context context = new Context(Locale.of("tr_TR"), Map.of("allowance", allowanceHtml));
+                            String html = templateEngine.process("allowance", context);
+                            ByteArrayOutputStream pdf = new ByteArrayOutputStream();
+
+                            String fileName = "allowance_" + allowanceHtml.getSerialNumber() + "_" + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf";
+
+                            HtmlConverter.convertToPdf(html, pdf);
+
+                            return Mono.just(ResponseEntity.ok()
+                                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + fileName)
+                                    .contentType(MediaType.APPLICATION_PDF)
+                                    .body(pdf.toByteArray()));
+                        }
+                );
     }
 }

@@ -203,16 +203,17 @@ CREATE TABLE if not exists system_settings
 
 CREATE TABLE if not exists allowances
 (
-    id          UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
-    created_at  TIMESTAMP    NOT NULL,
-    updated_at  TIMESTAMP    NOT NULL DEFAULT NOW(),
-    modified_by VARCHAR(255) NOT NULL,
-    amount      DECIMAL,
-    is_paid     BOOLEAN      NOT NULL DEFAULT FALSE,
-    description VARCHAR(255),
-    start_time  TIMESTAMP    NOT NULL DEFAULT NOW(),
-    end_time    TIMESTAMP    NOT NULL DEFAULT NOW(),
-    contract_id UUID         NOT NULL REFERENCES contracts (id)
+    id            UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
+    created_at    TIMESTAMP    NOT NULL,
+    updated_at    TIMESTAMP    NOT NULL DEFAULT NOW(),
+    modified_by   VARCHAR(255) NOT NULL,
+    serial_number VARCHAR(255) NOT NULL,
+    amount        DECIMAL,
+    is_paid       BOOLEAN      NOT NULL DEFAULT FALSE,
+    description   VARCHAR(255),
+    start_time    TIMESTAMP    NOT NULL DEFAULT NOW(),
+    end_time      TIMESTAMP    NOT NULL DEFAULT NOW(),
+    contract_id   UUID         NOT NULL REFERENCES contracts (id)
 );
 
 CREATE TABLE if not exists discounts
