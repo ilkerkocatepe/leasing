@@ -26,25 +26,13 @@ public class AllowanceController {
     @GetMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<AllowanceResponse> getById(@PathVariable UUID id) {
-        try {
-            return allowanceService.get(id);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-
-            return Mono.error(e);
-        }
+        return allowanceService.get(id);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Flux<AllowanceResponse> getAll(@ModelAttribute @Valid AllowanceFind allowanceFind) {
-        try {
-            return allowanceService.getAllByCriteria(allowanceFind);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-
-            return Flux.error(e);
-        }
+        return allowanceService.getAllByCriteria(allowanceFind);
     }
 
     @PostMapping
@@ -69,6 +57,12 @@ public class AllowanceController {
     @ResponseStatus(HttpStatus.OK)
     public Mono<AllowanceResponse> previewContract(@RequestBody AllowanceCreate allowanceCreate) {
         return allowanceService.preview(allowanceCreate);
+    }
+
+    @PostMapping("preview/html")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<String> previewHtml(@RequestBody AllowanceCreate allowanceCreate) {
+        return allowanceService.previewHtml(allowanceCreate);
     }
 
     @GetMapping("html")

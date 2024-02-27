@@ -26,10 +26,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -42,9 +46,11 @@ public class AllowanceService {
     private final TransactionService transactionService;
     private final ProductService productService;
     private final SpringWebFluxTemplateEngine templateEngine;
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     public Mono<AllowanceResponse> get(UUID id) {
         return allowanceRepository.findById(id)
+                .switchIfEmpty(Mono.error(new RuntimeException("Allowance not found.")))
                 .flatMap(allowance -> Mono.just(modelMapper.map(allowance, AllowanceResponse.class)))
                 .flatMap(allowanceResponse -> {
                     return contractService.get(allowanceResponse.getContractId()).flatMap(contractResponse -> {
@@ -61,6 +67,28 @@ public class AllowanceService {
                         allowanceResponse.setDiscount(discountResponse);
                         return Mono.just(allowanceResponse);
                     });
+                })
+                .flatMap(allowanceResponse -> {
+                    if (allowanceResponse.getStartTime() == null) {
+                        allowanceResponse.setStartTime(allowanceResponse.getContract().getStartAt());
+                    }
+
+                    return transactionService.calculateTransactions(allowanceResponse.getContractId(), allowanceResponse.getStartTime(), allowanceResponse.getEndTime()).flatMap(transactions -> {
+                        Double specialAreaPrice = allowanceResponse.getSpecialAreaPrice() == null ? allowanceResponse.getContract().getSpecialAreaPrice() : allowanceResponse.getSpecialAreaPrice();
+
+                        allowanceResponse.setAmount(transactions.values().stream().reduce(0.0, Double::sum) * specialAreaPrice);
+
+                        log.info("Transactions: " + transactions);
+                        return Flux.fromIterable(transactions.entrySet())
+                                .flatMap(transaction -> productService.get(transaction.getKey()).flatMap(productResponse -> {
+                                    allowanceResponse.getProducts().put(productResponse.getName(), transaction.getValue());
+                                    return Mono.just(allowanceResponse.getProducts());
+                                }))
+                                .flatMap(productResponses -> {
+                                    allowanceResponse.setProducts(productResponses);
+                                    return Flux.just(allowanceResponse);
+                                }).next();
+                    }).thenReturn(allowanceResponse);
                 });
     }
 
@@ -140,7 +168,7 @@ public class AllowanceService {
                     }
 
                     return transactionService.calculateTransactions(allowanceCreate.getContractId(), allowanceResponse.getStartTime(), allowanceCreate.getEndTime()).flatMap(transactions -> {
-                        allowanceResponse1.setAmount(transactions.values().stream().reduce(0.0, Double::sum) * allowanceResponse1.getSpecialAreaPrice());
+                        allowanceResponse1.setAmount((transactions.values().stream().reduce(0.0, Double::sum) * allowanceResponse1.getSpecialAreaPrice()));
 
                         log.info("Transactions: " + transactions);
                         return Flux.fromIterable(transactions.entrySet())
@@ -160,7 +188,7 @@ public class AllowanceService {
                         return Mono.just(allowanceResponse1);
                     }
 
-                    return discountService.create(allowanceCreate.getDiscount()).flatMap(discountResponse -> {
+                    return discountService.create(allowanceCreate.getDiscount()).flatMap(discountResponse -> { // TODO: check create?
                         allowanceResponse1.setDiscount(discountResponse);
                         allowanceResponse1.setDiscountId(discountResponse.getId());
                         return Mono.just(allowanceResponse1);
@@ -168,28 +196,28 @@ public class AllowanceService {
                 });
     }
 
-    private Mono<AllowanceHtml> getForHtml(UUID allowanceId) {
-        return this.get(allowanceId).flatMap(allowanceResponse -> {
-            AllowanceHtml allowanceHtml = new AllowanceHtml();
-            allowanceHtml.setDate(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-            allowanceHtml.setLogo(allowanceResponse.getContract().getSellerCustomer().getLogo());
-            allowanceHtml.setDealerTitle(allowanceResponse.getContract().getSellerCustomer().getTitle());
-            allowanceHtml.setSerialNumber(allowanceResponse.getSerialNumber());
-            allowanceHtml.setStartTime(allowanceResponse.getStartTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-            allowanceHtml.setEndTime(allowanceResponse.getEndTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-            allowanceHtml.setDealerAddress(allowanceResponse.getContract().getSellerCustomer().getAddressList().stream().filter(AddressResponse::getIsMain).findFirst().get().getCity());
-            allowanceHtml.setDealerPhoneNumber(allowanceResponse.getContract().getSellerCustomer().getPhoneNumber());
-            allowanceHtml.setDealerEmail("");
-            allowanceHtml.setCustomerTitle(allowanceResponse.getContract().getTakerCustomer().getTitle());
-            allowanceHtml.setCustomerAddress(allowanceResponse.getContract().getTakerCustomer().getAddressList().stream().filter(AddressResponse::getIsMain).findFirst().get().getCity());
-            allowanceHtml.setCustomerPhoneNumber(allowanceResponse.getContract().getTakerCustomer().getPhoneNumber());
-            allowanceHtml.setCustomerEmail("");
-            allowanceHtml.setConditions(ConditionsHtml.from(Map.of("Günlük m2 Fiyatı", String.valueOf(allowanceResponse.getSpecialAreaPrice()))));
-            allowanceHtml.setTransactions(TransactionsHtml.from(allowanceResponse.getTransactions()));
-            allowanceHtml.setTotalAmount(allowanceResponse.getAmount().toString());
+    private Mono<AllowanceHtml> getForHtml(AllowanceResponse allowanceResponse) {
+        AllowanceHtml allowanceHtml = new AllowanceHtml();
+        allowanceHtml.setDate(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        allowanceHtml.setLogo(allowanceResponse.getContract().getSellerCustomer().getLogoUrl());
+        allowanceHtml.setDealerTitle(allowanceResponse.getContract().getSellerCustomer().getTitle());
+        allowanceHtml.setSerialNumber(allowanceResponse.getSerialNumber());
+        allowanceHtml.setStartTime(allowanceResponse.getStartTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        allowanceHtml.setEndTime(allowanceResponse.getEndTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        allowanceHtml.setDealerAddress(allowanceResponse.getContract().getSellerCustomer().getAddressList().stream().filter(AddressResponse::getIsMain).findFirst().get().getCity());
+        allowanceHtml.setDealerPhoneNumber(allowanceResponse.getContract().getSellerCustomer().getPhoneNumber());
+        allowanceHtml.setDealerEmail("");
+        allowanceHtml.setCustomerTitle(allowanceResponse.getContract().getTakerCustomer().getTitle());
+        allowanceHtml.setCustomerAddress(allowanceResponse.getContract().getTakerCustomer().getAddressList().stream().filter(AddressResponse::getIsMain).findFirst().get().getCity());
+        allowanceHtml.setCustomerPhoneNumber(allowanceResponse.getContract().getTakerCustomer().getPhoneNumber());
+        allowanceHtml.setCustomerEmail("");
+        allowanceHtml.setConditions(ConditionsHtml.from(Map.of("Günlük m2 Fiyatı", String.valueOf(allowanceResponse.getSpecialAreaPrice()))));
+        allowanceHtml.setTransactions(TransactionsHtml.from(allowanceResponse.getTransactions()));
+        allowanceHtml.setTotalAmount(df.format(allowanceResponse.getAmount()));
 
-            return Mono.just(allowanceHtml);
-        });
+        log.info("Allowance html: " + allowanceHtml);
+
+        return Mono.just(allowanceHtml);
     }
 
     public Mono<AllowanceResponse> update(UUID id, AllowanceCreate allowanceCreate) {
@@ -222,8 +250,21 @@ public class AllowanceService {
         return allowanceRepository.deleteById(id);
     }
 
+    public Mono<String> previewHtml(AllowanceCreate allowanceCreate) {
+        return this.preview(allowanceCreate)
+                .flatMap(this::getForHtml)
+                .flatMap(
+                        allowanceHtml -> {
+                            Context context = new Context(Locale.of("tr_TR"), Map.of("allowance", allowanceHtml));
+                            String html = templateEngine.process("allowance", context);
+                            return Mono.just(html);
+                        }
+                );
+    }
+
     public Mono<String> html(UUID allowanceId) {
-        return this.getForHtml(allowanceId)
+        return this.get(allowanceId)
+                .flatMap(this::getForHtml)
                 .flatMap(
                         allowanceHtml -> {
                             Context context = new Context(Locale.of("tr_TR"), Map.of("allowance", allowanceHtml));
@@ -234,7 +275,8 @@ public class AllowanceService {
     }
 
     public Mono<ResponseEntity<byte[]>> download(UUID allowanceId) {
-        return this.getForHtml(allowanceId)
+        return this.get(allowanceId)
+                .flatMap(this::getForHtml)
                 .flatMap(
                         allowanceHtml -> {
                             Context context = new Context(Locale.of("tr_TR"), Map.of("allowance", allowanceHtml));

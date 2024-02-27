@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -189,10 +189,10 @@
         </tr>
 
         <tr class="item" th:each="transaction : ${allowance.transactions}">
-            <td><span th:text="${transcation.productName}"></span></td>
-            <td><span th:text="${transcation.type}"></span></td>
-            <td><span th:text="${transcation.issueDate}"></span></td>
-            <td><span th:text="${transcation.amount}"></span></td>
+            <td><span th:text="${transaction.productName}"></span></td>
+            <td><span th:text="${transaction.type}"></span></td>
+            <td><span th:text="${transaction.issueDate}"></span></td>
+            <td><span th:text="${transaction.amount}"></span></td>
         </tr>
 
         <tr class="total">
