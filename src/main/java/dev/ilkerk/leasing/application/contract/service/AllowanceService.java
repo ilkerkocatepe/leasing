@@ -13,8 +13,9 @@ import dev.ilkerk.leasing.domain.contract.entity.Allowance;
 import dev.ilkerk.leasing.domain.contract.repository.AllowanceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.WordUtils;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.internal.bytebuddy.utility.RandomString;
 import org.springframework.data.domain.Example;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -111,6 +112,10 @@ public class AllowanceService {
                 .flatMap(allowance1 -> Mono.just(modelMapper.map(allowance1, AllowanceResponse.class)));
     }
 
+    public Mono<Long> countAllByCustomerId(UUID customerId) {
+        return allowanceRepository.countAllByCustomerId(customerId);
+    }
+
     public Mono<LocalDateTime> getLastEndTimeByContractId(UUID contractId) {
         return allowanceRepository.findFirstByContractIdOrderByEndTimeDesc(contractId)
                 .switchIfEmpty(Mono.empty())
@@ -123,10 +128,10 @@ public class AllowanceService {
         return this.preview(allowanceCreate)
                 .flatMap(allowanceResponse -> {
                     log.info("Allowance preview: " + allowanceResponse.toString());
-                    Allowance allowance = modelMapper.map(allowanceCreate, Allowance.class);
+                    Allowance allowance = modelMapper.map(allowanceResponse, Allowance.class);
                     allowance.setModifiedBy(modifiedBy);
                     allowance.setAmount(allowanceResponse.getAmount());
-                    allowance.setSerialNumber("TEST" + RandomString.make(6));
+                    allowance.setCustomerId(allowanceResponse.getContract().getSellerCustomer().getId());
 
                     log.info("Allowance mapped: " + allowance);
 
@@ -142,6 +147,11 @@ public class AllowanceService {
                                 return Mono.just(allowanceResponse);
                             });
                 });
+    }
+
+    public Mono<String> generateSerialNumber(String sellerName, UUID customerId) {
+        return this.countAllByCustomerId(customerId)
+                .map(count -> WordUtils.initials(sellerName) + "-" + StringUtils.leftPad(String.valueOf(count + 1), 6, "0"));
     }
 
     public Mono<AllowanceResponse> preview(AllowanceCreate allowanceCreate) {
@@ -197,6 +207,12 @@ public class AllowanceService {
                     return discountService.create(allowanceCreate.getDiscount()).flatMap(discountResponse -> { // TODO: check create?
                         allowanceResponse1.setDiscount(discountResponse);
                         allowanceResponse1.setDiscountId(discountResponse.getId());
+                        return Mono.just(allowanceResponse1);
+                    });
+                })
+                .flatMap(allowanceResponse1 -> {
+                    return this.generateSerialNumber(allowanceResponse1.getContract().getSellerCustomer().getTitle(), allowanceResponse1.getContract().getSellerCustomer().getId()).flatMap(serialNumber -> {
+                        allowanceResponse1.setSerialNumber(serialNumber);
                         return Mono.just(allowanceResponse1);
                     });
                 });

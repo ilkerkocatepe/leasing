@@ -130,6 +130,14 @@
 			<version>2.15.1</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.11.0</version>
+		</dependency>
+
+
 		<!-- https://mvnrepository.com/artifact/com.itextpdf/html2pdf -->
 		<dependency>
 			<groupId>com.itextpdf</groupId>
@@ -174,7 +182,7 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>

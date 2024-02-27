@@ -213,7 +213,8 @@ CREATE TABLE if not exists allowances
     description   VARCHAR(255),
     start_time    TIMESTAMP    NOT NULL DEFAULT NOW(),
     end_time      TIMESTAMP    NOT NULL DEFAULT NOW(),
-    contract_id   UUID         NOT NULL REFERENCES contracts (id)
+    contract_id   UUID         NOT NULL REFERENCES contracts (id),
+    customer_id   UUID         NOT NULL REFERENCES customers (id)
 );
 
 CREATE TABLE if not exists discounts

@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface AllowanceRepository extends R2dbcRepository<Allowance, UUID> {
     Mono<Allowance> findFirstByContractIdOrderByEndTimeDesc(UUID contractId);
-    Mono<Long> countAllByContractId(UUID contractId);
+    Mono<Long> countAllByCustomerId(UUID customerId);
 }

@@ -34,4 +34,5 @@ public class Allowance {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private UUID contractId;
+    private UUID customerId;
 }

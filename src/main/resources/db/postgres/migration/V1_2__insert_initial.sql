@@ -1,7 +1,7 @@
 INSERT INTO "customers" ("id", "created_at", "updated_at", "title", "logo", "tax_number", "tax_administration",
                          "mersis_number", "phone_number", "is_dealer")
 VALUES ('1ad58199-d546-425c-913d-c783b89b64e1', '2023-12-13 20:43:42.309602', '2023-12-13 20:43:42.309602',
-        'Karadeniz İskele', NULL, '5090583923', 'Çekirge Vergi Dairesi Müd.', '123456789123', '4448541', true);
+        'Karadeniz İskele', 'karadeniziskele.png', '5090583923', 'Çekirge Vergi Dairesi Müd.', '123456789123', '4448541', true);
 
 INSERT INTO "customers" ("id", "created_at", "updated_at", "title", "logo", "tax_number", "tax_administration",
                          "mersis_number", "phone_number", "is_dealer")

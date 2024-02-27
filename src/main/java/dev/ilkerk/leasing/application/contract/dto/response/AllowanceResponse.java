@@ -28,6 +28,7 @@ public class AllowanceResponse {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private UUID contractId;
+    private UUID customerId;
     private UUID discountId;
     private UUID invoiceId;
     private ContractResponse contract;
