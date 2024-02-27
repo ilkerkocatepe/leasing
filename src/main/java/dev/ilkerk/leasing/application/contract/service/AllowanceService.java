@@ -55,6 +55,12 @@ public class AllowanceService {
                 .flatMap(allowanceResponse -> {
                     return contractService.get(allowanceResponse.getContractId()).flatMap(contractResponse -> {
                         allowanceResponse.setContract(contractResponse);
+                        allowanceResponse.setTransactions(contractResponse.getTransactionList());
+
+                        if (allowanceResponse.getSpecialAreaPrice() == null) {
+                            allowanceResponse.setSpecialAreaPrice(contractResponse.getSpecialAreaPrice());
+                        }
+
                         return Mono.just(allowanceResponse);
                     });
                 })
@@ -74,9 +80,9 @@ public class AllowanceService {
                     }
 
                     return transactionService.calculateTransactions(allowanceResponse.getContractId(), allowanceResponse.getStartTime(), allowanceResponse.getEndTime()).flatMap(transactions -> {
-                        Double specialAreaPrice = allowanceResponse.getSpecialAreaPrice() == null ? allowanceResponse.getContract().getSpecialAreaPrice() : allowanceResponse.getSpecialAreaPrice();
-
-                        allowanceResponse.setAmount(transactions.values().stream().reduce(0.0, Double::sum) * specialAreaPrice);
+//                        Double specialAreaPrice = allowanceResponse.getSpecialAreaPrice() == null ? allowanceResponse.getContract().getSpecialAreaPrice() : allowanceResponse.getSpecialAreaPrice();
+//
+//                        allowanceResponse.setAmount(transactions.values().stream().reduce(0.0, Double::sum) * specialAreaPrice);
 
                         log.info("Transactions: " + transactions);
                         return Flux.fromIterable(transactions.entrySet())

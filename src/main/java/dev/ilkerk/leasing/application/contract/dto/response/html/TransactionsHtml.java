@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
@@ -26,8 +27,8 @@ public class TransactionsHtml {
         return transactionResponse.stream()
                 .map(transaction -> TransactionsHtml.builder()
                         .productName(transaction.getProduct().getName())
-                        .type(String.valueOf(transaction.getType()))
-                        .issueDate(transaction.getIssueDate().toString())
+                        .type(String.valueOf(transaction.getType().getValue()))
+                        .issueDate(transaction.getIssueDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
                         .amount(transaction.getAmount().toString())
                         .build())
                 .toList();
