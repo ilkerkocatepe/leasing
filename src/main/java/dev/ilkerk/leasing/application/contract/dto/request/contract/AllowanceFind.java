@@ -24,6 +24,7 @@ public class AllowanceFind {
     private Double amount;
     private Boolean isPaid;
     private UUID contractId;
+    private UUID customerId;
     private UUID discountId;
     private UUID invoiceId;
 
@@ -36,6 +37,7 @@ public class AllowanceFind {
                 .withMatcher("amount", exact())
                 .withMatcher("isPaid", exact())
                 .withMatcher("contractId", exact())
+                .withMatcher("customerId", exact())
                 .withMatcher("discountId", exact())
                 .withMatcher("invoiceId", exact());
     }

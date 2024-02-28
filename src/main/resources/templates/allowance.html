@@ -46,6 +46,7 @@
             line-height: 24px;
             font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
             color: #555;
+            background: #fff;
         }
 
         .invoice-box table {
@@ -94,6 +95,14 @@
 
         .invoice-box table tr.item td {
             border-bottom: 1px solid #eee;
+        }
+
+        .invoice-box table tr td.center {
+            text-align: center;
+        }
+
+        .invoice-box table tr td.right {
+            text-align: right;
         }
 
         .invoice-box table tr.item.last td {
@@ -172,35 +181,56 @@
             <td>Koşullar</td>
             <td></td>
             <td></td>
-            <td>#</td>
+            <td class="right">#</td>
         </tr>
 
         <tr class="details" th:each="condition : ${allowance.conditions}">
             <td><span th:text="${condition.name}"></span></td>
             <td></td>
             <td></td>
-            <td><span th:text="${condition.value}"></span></td>
+            <td class="right"><span th:text="${condition.value}"></span></td>
         </tr>
 
         <tr class="heading">
             <td>Kiralama Hareketleri</td>
-            <td>Hareket Tipi</td>
-            <td>Zaman</td>
-            <td>Miktar</td>
+            <td class="center">Hareket Tipi</td>
+            <td class="center">Zaman</td>
+            <td class="right">Miktar</td>
         </tr>
 
         <tr class="item" th:each="transaction : ${allowance.transactions}">
             <td><span th:text="${transaction.productName}"></span></td>
-            <td><span th:text="${transaction.type}"></span></td>
-            <td><span th:text="${transaction.issueDate}"></span></td>
-            <td><span th:text="${transaction.amount}"></span></td>
+            <td class="center"><span th:text="${transaction.type}"></span></td>
+            <td class="center"><span th:text="${transaction.issueDate}"></span></td>
+            <td class="right"><span th:text="${transaction.amount}"></span></td>
+        </tr>
+
+        <tr class="heading">
+            <td>Malzeme</td>
+            <td></td>
+            <td></td>
+            <td class="right">Tutar</td>
+        </tr>
+
+        <tr class="item" th:each="product : ${allowance.products}">
+            <td><span th:text="${product.name}"></span></td>
+            <td></td>
+            <td></td>
+            <td class="right"><span th:text="${product.value}"></span></td>
+        </tr>
+
+        <tr class="item" th:if="${allowance?.discount}">
+            <td>İndirim</td>
+            <td></td>
+            <td></td>
+            <td class="right"><span th:text="${allowance.discount}"></span></td>
         </tr>
 
         <tr class="total">
             <td></td>
             <td></td>
             <td></td>
-            <td>Toplam: <span th:text="${allowance.totalAmount}"></span></td>
+            <td class="right">Toplam: <span th:text="${allowance.totalAmount}"></span></td>
         </tr>
     </table>
 </div>

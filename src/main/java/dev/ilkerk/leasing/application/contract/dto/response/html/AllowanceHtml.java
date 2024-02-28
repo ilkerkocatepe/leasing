@@ -27,5 +27,7 @@ public class AllowanceHtml {
     private String customerEmail;
     private List<ConditionsHtml> conditions;
     private List<TransactionsHtml> transactions;
+    private List<ProductsHtml> products;
+    private String discount;
     private String totalAmount;
 }

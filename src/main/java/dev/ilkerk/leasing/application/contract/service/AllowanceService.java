@@ -4,8 +4,10 @@ import com.itextpdf.html2pdf.HtmlConverter;
 import dev.ilkerk.leasing.application.contract.dto.request.contract.AllowanceCreate;
 import dev.ilkerk.leasing.application.contract.dto.request.contract.AllowanceFind;
 import dev.ilkerk.leasing.application.contract.dto.response.AllowanceResponse;
+import dev.ilkerk.leasing.application.contract.dto.response.DiscountResponse;
 import dev.ilkerk.leasing.application.contract.dto.response.html.AllowanceHtml;
 import dev.ilkerk.leasing.application.contract.dto.response.html.ConditionsHtml;
+import dev.ilkerk.leasing.application.contract.dto.response.html.ProductsHtml;
 import dev.ilkerk.leasing.application.contract.dto.response.html.TransactionsHtml;
 import dev.ilkerk.leasing.application.customer.dto.response.AddressResponse;
 import dev.ilkerk.leasing.application.product.service.ProductService;
@@ -145,6 +147,18 @@ public class AllowanceService {
                                 allowanceResponse.setModifiedBy(allowance1.getModifiedBy());
 
                                 return Mono.just(allowanceResponse);
+                            })
+                            .flatMap(allowanceResponse1 -> {
+                                log.info("Allowance response2: " + allowanceResponse1);
+                                if (allowanceCreate.getDiscount() == null) {
+                                    return Mono.just(allowanceResponse1);
+                                }
+
+                                return discountService.create(allowanceCreate.getDiscount()).flatMap(discountResponse -> {
+                                    allowanceResponse1.setDiscount(discountResponse);
+                                    allowanceResponse1.setDiscountId(discountResponse.getId());
+                                    return Mono.just(allowanceResponse1);
+                                });
                             });
                 });
     }
@@ -204,11 +218,11 @@ public class AllowanceService {
                         return Mono.just(allowanceResponse1);
                     }
 
-                    return discountService.create(allowanceCreate.getDiscount()).flatMap(discountResponse -> { // TODO: check create?
-                        allowanceResponse1.setDiscount(discountResponse);
-                        allowanceResponse1.setDiscountId(discountResponse.getId());
-                        return Mono.just(allowanceResponse1);
-                    });
+                    DiscountResponse discountResponse = modelMapper.map(allowanceCreate.getDiscount(), DiscountResponse.class);
+                    allowanceResponse1.setDiscount(discountResponse);
+                    allowanceResponse1.setAmount(allowanceResponse1.getAmount() - discountResponse.getAmount());
+
+                    return Mono.just(allowanceResponse1);
                 })
                 .flatMap(allowanceResponse1 -> {
                     return this.generateSerialNumber(allowanceResponse1.getContract().getSellerCustomer().getTitle(), allowanceResponse1.getContract().getSellerCustomer().getId()).flatMap(serialNumber -> {
@@ -235,6 +249,8 @@ public class AllowanceService {
         allowanceHtml.setCustomerEmail("");
         allowanceHtml.setConditions(ConditionsHtml.from(Map.of("Günlük m2 Fiyatı", String.valueOf(allowanceResponse.getSpecialAreaPrice()))));
         allowanceHtml.setTransactions(TransactionsHtml.from(allowanceResponse.getTransactions()));
+        allowanceHtml.setProducts(ProductsHtml.from(allowanceResponse.getProducts()));
+        allowanceHtml.setDiscount(df.format(allowanceResponse.getDiscount().getAmount()));
         allowanceHtml.setTotalAmount(df.format(allowanceResponse.getAmount()));
 
         log.info("Allowance html: " + allowanceHtml);
