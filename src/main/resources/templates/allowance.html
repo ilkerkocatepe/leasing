@@ -11,20 +11,20 @@
 
     <!-- Invoice styling -->
     <style>
-        body {
+        body.allowance-body {
             font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
             text-align: center;
             color: #777;
         }
 
-        body h1 {
+        body.allowance-body h1 {
             font-weight: 300;
             margin-bottom: 0px;
             padding-bottom: 0px;
             color: #000;
         }
 
-        body h3 {
+        body.allowance-body h3 {
             font-weight: 300;
             margin-top: 10px;
             margin-bottom: 20px;
@@ -32,7 +32,7 @@
             color: #555;
         }
 
-        body a {
+        body.allowance-body a {
             color: #06f;
         }
 
@@ -72,6 +72,10 @@
             font-size: 45px;
             line-height: 45px;
             color: #333;
+        }
+
+        .invoice-box table tr.top table td.dates {
+            text-align: right;
         }
 
         .invoice-box table tr.information table td {
@@ -117,9 +121,8 @@
     </style>
 </head>
 
-<body>
+<body class="allowance-body">
 <h1>HAKEDİŞ DETAYI</h1>
-<h4>Hakediş bilgileri aşağıda sunulduğu gibidir.</h4>
 <br /><br /><br />
 
 <div class="invoice-box">
@@ -135,7 +138,7 @@
                         <td></td>
                         <td></td>
 
-                        <td>
+                        <td class="dates">
                             Hakediş Seri No: <span th:text="${allowance.serialNumber}"></span><br />
                             Oluşturulma Tarihi: <span th:text="${allowance.date}"></span><br />
                             Zaman Aralığı: <span th:text="${allowance.startTime}"></span>/<span th:text="${allowance.endTime}"></span>
