@@ -1,6 +1,7 @@
 package dev.ilkerk.leasing.infrastracture.security;
 
 import dev.ilkerk.leasing.domain.user.entity.Role;
+import dev.ilkerk.leasing.domain.user.exception.UnauthorizedException;
 import dev.ilkerk.leasing.domain.user.repository.UserRepository;
 import dev.ilkerk.leasing.infrastracture.security.jwt.JwtTokenAuthenticationFilter;
 import dev.ilkerk.leasing.infrastracture.security.jwt.JwtTokenProvider;
@@ -48,7 +49,8 @@ public class SecurityConfig {
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .authenticationManager(reactiveAuthenticationManager)
                 .exceptionHandling(exceptionHandlingSpec -> exceptionHandlingSpec
-                        .authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED)))
+                        .authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED))
+                        .accessDeniedHandler((exchange, denied) -> Mono.error(new UnauthorizedException())))
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(it -> it
                         .pathMatchers("/webjars/**").permitAll()
