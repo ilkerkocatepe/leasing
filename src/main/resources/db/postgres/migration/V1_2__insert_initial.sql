@@ -61,7 +61,7 @@ VALUES ('d14cc303-c9a5-436d-b7ba-4f88f281e857', '2023-12-23 01:53:03.437155', 'I
 INSERT INTO "users" ("id", "created_at", "updated_at", "name", "email", "password", "active", "roles")
 VALUES ('5f1dbabd-2392-4b46-a416-649b3a640d53', '2024-01-28 16:37:43.276574', '2024-01-28 16:37:43.276574',
         'user', 'info@karadeniziskele.com', '{bcrypt}$2a$10$xJyPegfXXcRNpzewt3WMS.5rAgMCgduvcE7Ns3NO/Uq5gx1wJfYYS', 't',
-        '{CUSTOMER}'),
+        '{CUSTOMER,DEALER}'),
        ('a4c9d089-ddae-4121-b410-d313bdd9a3f7', '2024-01-28 16:37:43.352835', '2024-01-28 16:37:43.352835',
         'admin', 'admin@admin.com', '{bcrypt}$2a$10$m3V6uz/MDuLUFthQJBBYJ.1Vo72uLsyQM7K2gYJbK8lbHaPDV1yym', 't',
         '{CUSTOMER,DEALER,ADMIN}');

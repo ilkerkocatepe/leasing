@@ -155,6 +155,7 @@ public class AllowanceService {
                                 }
 
                                 return discountService.create(allowanceCreate.getDiscount()).flatMap(discountResponse -> {
+                                    allowanceResponse1.setModifiedBy(modifiedBy);
                                     allowanceResponse1.setDiscount(discountResponse);
                                     allowanceResponse1.setDiscountId(discountResponse.getId());
                                     return Mono.just(allowanceResponse1);
@@ -234,6 +235,11 @@ public class AllowanceService {
 
     private Mono<AllowanceHtml> getForHtml(AllowanceResponse allowanceResponse) {
         AllowanceHtml allowanceHtml = new AllowanceHtml();
+
+        if (allowanceResponse.getDiscount() != null && allowanceResponse.getDiscount().getAmount() > 0) {
+            allowanceHtml.setDiscount(df.format(allowanceResponse.getDiscount().getAmount()));
+        }
+
         allowanceHtml.setDate(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         allowanceHtml.setLogo(allowanceResponse.getContract().getSellerCustomer().getLogoUrl());
         allowanceHtml.setDealerTitle(allowanceResponse.getContract().getSellerCustomer().getTitle());
@@ -250,7 +256,6 @@ public class AllowanceService {
         allowanceHtml.setConditions(ConditionsHtml.from(Map.of("Günlük m2 Fiyatı", String.valueOf(allowanceResponse.getSpecialAreaPrice()))));
         allowanceHtml.setTransactions(TransactionsHtml.from(allowanceResponse.getTransactions()));
         allowanceHtml.setProducts(ProductsHtml.from(allowanceResponse.getProducts()));
-        allowanceHtml.setDiscount(df.format(allowanceResponse.getDiscount().getAmount()));
         allowanceHtml.setTotalAmount(df.format(allowanceResponse.getAmount()));
 
         log.info("Allowance html: " + allowanceHtml);

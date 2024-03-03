@@ -61,7 +61,7 @@ public class CustomerController {
 
 	@PostMapping("create-with-address")
 	@ResponseStatus(HttpStatus.CREATED)
-	@PreAuthorize("hasRole('ADMIN') OR hasRole('DEALER')")
+	@PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('DEALER')")
 	public Mono<CustomerResponse> createWithAddress(@RequestBody @Valid CustomerWithAddressCreateDTO customerWithAddressCreateDTO) {
 		try {
 			return customerService.createWithAddress(customerWithAddressCreateDTO);
