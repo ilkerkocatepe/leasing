@@ -2,6 +2,8 @@
 Leasing/Renting outdoor platforms like scaffolding systems.
 
 ### Todo
+- [ ] Allowance Html - Transaction sorting
+- [ ] All lists should be sorted by date
 - [ ] Stock update after transaction ~1d #feature @ilker
 - [ ] Contract note type ~1h #feature @ilker
 - [ ] Soft delete implementation ~1d #feature @ilker
@@ -10,9 +12,9 @@ Leasing/Renting outdoor platforms like scaffolding systems.
 - [ ] BaseResponse ~1d #feature @ilker
 
 ### In Progress
-- [ ] Allowance
 
 ### Done ✓
+- [x] Allowance
 - [x] Customer for user ~1d #feature @ilker
 - [x] PROD settings, CORS etc. ~1d #feature @ilker
 - [x] Jenkins pipeline ~1d #feature @ilker

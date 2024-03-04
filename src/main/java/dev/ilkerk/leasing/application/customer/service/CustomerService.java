@@ -129,7 +129,9 @@ public class CustomerService {
                     return Mono.just(customerResponse);
                 }))
                 .flatMap(customerResponse -> {
-                    UserCreateDTO userCreateDTO = modelMapper.map(customerCreateDTO.getUser(), UserCreateDTO.class);
+                    UserCreateDTO userCreateDTO = new UserCreateDTO();
+                    userCreateDTO.setName(customerCreateDTO.getTitle());
+                    userCreateDTO.setEmail(customerCreateDTO.getEmail());
                     userCreateDTO.setCustomerId(customerResponse.getId());
                     userCreateDTO.setActive(Boolean.TRUE);
                     userCreateDTO.setRoles(List.of(Role.CUSTOMER));

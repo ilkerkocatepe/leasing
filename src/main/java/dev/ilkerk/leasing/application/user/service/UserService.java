@@ -49,6 +49,9 @@ public class UserService {
 
 	public Mono<UserResponse> create(UserCreateDTO userCreateDTO) {
 		log.info("User creating: " + userCreateDTO.toString());
+		if (userCreateDTO.getPassword() == null || userCreateDTO.getPassword().isEmpty()) {
+			userCreateDTO.setPassword("Bursa16"); // TODO: fix this
+		}
 
 		User user = modelMapper.map(userCreateDTO, User.class);
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
