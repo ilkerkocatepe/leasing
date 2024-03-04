@@ -42,6 +42,10 @@ public class DiscountService {
     }
 
     public Mono<DiscountResponse> create(DiscountCreate discountCreate) {
+        if (discountCreate.getAmount() == null || discountCreate.getAmount() <= 0) {
+            return Mono.error(new RuntimeException("Discount amount must be greater than 0"));
+        }
+
         log.info("Discount creating: " + discountCreate.toString());
 
         Discount discount = modelMapper.map(discountCreate, Discount.class);

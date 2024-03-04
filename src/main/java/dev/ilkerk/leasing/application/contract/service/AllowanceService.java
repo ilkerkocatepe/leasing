@@ -199,7 +199,13 @@ public class AllowanceService {
                     }
 
                     return transactionService.calculateTransactions(allowanceCreate.getContractId(), allowanceResponse.getStartTime(), allowanceCreate.getEndTime()).flatMap(transactions -> {
-                        allowanceResponse1.setAmount((transactions.values().stream().reduce(0.0, Double::sum) * allowanceResponse1.getSpecialAreaPrice()));
+                        double amount = (transactions.values().stream().reduce(0.0, Double::sum) * allowanceResponse1.getSpecialAreaPrice());
+
+                        if (amount <= 0) {
+                            return Mono.error(new RuntimeException("Allowance amount must be greater than 0"));
+                        }
+
+                        allowanceResponse1.setAmount(amount);
 
                         log.info("Transactions: " + transactions);
                         return Flux.fromIterable(transactions.entrySet())
@@ -215,7 +221,9 @@ public class AllowanceService {
                 })
                 .flatMap(allowanceResponse1 -> {
                     log.info("Allowance response2: " + allowanceResponse1);
-                    if (allowanceCreate.getDiscount() == null) {
+                    if (allowanceCreate.getDiscount() == null ||
+                            allowanceCreate.getDiscount().getAmount() == null ||
+                            allowanceCreate.getDiscount().getAmount() <= 0) {
                         return Mono.just(allowanceResponse1);
                     }
 
