@@ -1,5 +1,6 @@
 package dev.ilkerk.leasing.application.user.service;
 
+import dev.ilkerk.leasing.application.user.dto.request.user.ChangePasswordRequest;
 import dev.ilkerk.leasing.application.user.dto.request.user.UserCreateDTO;
 import dev.ilkerk.leasing.application.user.dto.request.user.UserFindDTO;
 import dev.ilkerk.leasing.application.user.dto.response.UserResponse;
@@ -24,116 +25,133 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
-	private final UserRepository userRepository;
-	private final ModelMapper modelMapper;
-	private final CustomerUsersService customerUsersService;
-	private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
+    private final CustomerUsersService customerUsersService;
+    private final PasswordEncoder passwordEncoder;
 
-	public Mono<UserResponse> get(UUID id) {
-		return userRepository.findById(id)
-				.flatMap(user -> Mono.just(modelMapper.map(user, UserResponse.class)));
-	}
+    public Mono<UserResponse> get(UUID id) {
+        return userRepository.findById(id)
+                .flatMap(user -> Mono.just(modelMapper.map(user, UserResponse.class)));
+    }
 
-	public Mono<User> getObject(UUID id) {
-		return userRepository.findById(id);
-	}
+    public Mono<User> getObject(UUID id) {
+        return userRepository.findById(id);
+    }
 
-	public Flux<UserResponse> getAllByCriteria(UserFindDTO userFindDTO) {
-		User user = modelMapper.map(userFindDTO, User.class);
+    public Flux<UserResponse> getAllByCriteria(UserFindDTO userFindDTO) {
+        User user = modelMapper.map(userFindDTO, User.class);
 
-		Example<User> userExample = Example.of(user, UserFindDTO.getExampleMatcher());
+        Example<User> userExample = Example.of(user, UserFindDTO.getExampleMatcher());
 
-		return userRepository.findAll(userExample)
-				.flatMap(user1 -> Mono.just(modelMapper.map(user1, UserResponse.class)));
-	}
+        return userRepository.findAll(userExample)
+                .flatMap(user1 -> Mono.just(modelMapper.map(user1, UserResponse.class)));
+    }
 
-	public Mono<UserResponse> create(UserCreateDTO userCreateDTO) {
-		log.info("User creating: " + userCreateDTO.toString());
-		if (userCreateDTO.getPassword() == null || userCreateDTO.getPassword().isEmpty()) {
-			userCreateDTO.setPassword("Bursa16"); // TODO: fix this
-		}
+    public Mono<UserResponse> create(UserCreateDTO userCreateDTO) {
+        log.info("User creating: " + userCreateDTO.toString());
+        if (userCreateDTO.getPassword() == null || userCreateDTO.getPassword().isEmpty()) {
+            userCreateDTO.setPassword("Bursa16"); // TODO: fix this
+        }
 
-		User user = modelMapper.map(userCreateDTO, User.class);
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = modelMapper.map(userCreateDTO, User.class);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-		log.info("Created user object: " + user);
+        log.info("Created user object: " + user);
 
-		return userRepository.save(user)
-				.flatMap(user1 -> Mono.just(modelMapper.map(user1, UserResponse.class)))
-				.flatMap(userResponse -> customerUsersService.create(new CustomerUsers(userCreateDTO.getCustomerId(), userResponse.getId()))
-						.flatMap(customerUser -> Mono.just(userResponse))
-				);
-	}
+        return userRepository.save(user)
+                .flatMap(user1 -> Mono.just(modelMapper.map(user1, UserResponse.class)))
+                .flatMap(userResponse -> customerUsersService.create(new CustomerUsers(userCreateDTO.getCustomerId(), userResponse.getId()))
+                        .flatMap(customerUser -> Mono.just(userResponse))
+                );
+    }
 
-	public Mono<UserResponse> update(UUID id, UserCreateDTO userCreateDTO) {
-		log.info("User updating: " + userCreateDTO.toString());
+    public Mono<UserResponse> update(UUID id, UserCreateDTO userCreateDTO) {
+        log.info("User updating: " + userCreateDTO.toString());
 
-		return this.getObject(id)
-				.map(Optional::of)
-				.switchIfEmpty(Mono.error(new Exception("User not found with id: " + id)))
-				.flatMap(optionalUser -> {
-					if (optionalUser.isPresent()) {
-						User updatedUser = this.getUpdatedUser(optionalUser.get(), userCreateDTO);
-						updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-						log.info("Updated user object: " + updatedUser);
+        return this.getObject(id)
+                .map(Optional::of)
+                .switchIfEmpty(Mono.error(new Exception("User not found with id: " + id)))
+                .flatMap(optionalUser -> {
+                    if (optionalUser.isPresent()) {
+                        User updatedUser = this.getUpdatedUser(optionalUser.get(), userCreateDTO);
+                        updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+                        log.info("Updated user object: " + updatedUser);
 
-						return userRepository.save(updatedUser);
-					}
-					return Mono.empty();
-				})
-				.flatMap(user1 -> Mono.just(modelMapper.map(user1, UserResponse.class)));
-	}
+                        return userRepository.save(updatedUser);
+                    }
+                    return Mono.empty();
+                })
+                .flatMap(user1 -> Mono.just(modelMapper.map(user1, UserResponse.class)));
+    }
 
-	private User getUpdatedUser(User user, UserCreateDTO userCreateDTO) {
-		if (userCreateDTO.getName() != null) {
-			user.setName(userCreateDTO.getName());
-		}
+    private User getUpdatedUser(User user, UserCreateDTO userCreateDTO) {
+        if (userCreateDTO.getName() != null) {
+            user.setName(userCreateDTO.getName());
+        }
 
-		if (userCreateDTO.getEmail() != null) {
-			user.setEmail(userCreateDTO.getEmail());
-		}
+        if (userCreateDTO.getEmail() != null) {
+            user.setEmail(userCreateDTO.getEmail());
+        }
 
-		if (userCreateDTO.getPassword() != null) {
-			user.setPassword(userCreateDTO.getPassword());
-		}
+        if (userCreateDTO.getPassword() != null) {
+            user.setPassword(userCreateDTO.getPassword());
+        }
 
-		if (userCreateDTO.getActive() != null) {
-			user.setActive(userCreateDTO.getActive());
-		}
+        if (userCreateDTO.getActive() != null) {
+            user.setActive(userCreateDTO.getActive());
+        }
 
-		if (userCreateDTO.getRoles() != null) {
-			user.setRoles(userCreateDTO.getRoles());
-		}
+        if (userCreateDTO.getRoles() != null) {
+            user.setRoles(userCreateDTO.getRoles());
+        }
 
-		return user;
-	}
+        return user;
+    }
 
-	public Mono<Void> deleteById(UUID id) {
-		log.info("User deleting: " + id);
+    public Mono<Void> deleteById(UUID id) {
+        log.info("User deleting: " + id);
 
-		return userRepository.deleteById(id);
-	}
+        return userRepository.deleteById(id);
+    }
 
-	public Mono<UUID> findCustomerIdByEmail(String email) {
-		return userRepository.findByEmail(email)
-				.flatMap(user -> customerUsersService.findCustomerIdByUserId(user.getId()).flatMap(Mono::just));
-	}
+    public Mono<UUID> findCustomerIdByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .flatMap(user -> customerUsersService.findCustomerIdByUserId(user.getId()).flatMap(Mono::just));
+    }
 
-	public Mono<UUID> findUserIdByEmail(String email) {
-		return userRepository.findByEmail(email).flatMap(user -> Mono.just(user.getId()));
-	}
+    public Mono<UUID> findUserIdByEmail(String email) {
+        return userRepository.findByEmail(email).flatMap(user -> Mono.just(user.getId()));
+    }
 
-	public Map<String, String> getUserIdAndCustomerId(Authentication authentication) {
-		String customerId;
-		String userId;
-		try {
-			customerId = (String) ((Map<?, ?>) authentication.getDetails()).get("customerId");
-			userId = (String) ((Map<?, ?>) authentication.getDetails()).get("userId");
-		} catch (Exception e) {
-			log.error("Error while getting customerId and userId from authentication: {}", authentication.getDetails(), e);
-			throw new RuntimeException("Error while getting customerId and userId from authentication: " + authentication.getDetails(), e);
-		}
+    public Map<String, String> getUserIdAndCustomerId(Authentication authentication) {
+        String customerId;
+        String userId;
+        try {
+            customerId = (String) ((Map<?, ?>) authentication.getDetails()).get("customerId");
+            userId = (String) ((Map<?, ?>) authentication.getDetails()).get("userId");
+        } catch (Exception e) {
+            log.error("Error while getting customerId and userId from authentication: {}", authentication.getDetails(), e);
+            throw new RuntimeException("Error while getting customerId and userId from authentication: " + authentication.getDetails(), e);
+        }
 
-		return Map.of("customerId", customerId, "userId", userId);
-	}
+        return Map.of("customerId", customerId, "userId", userId);
+    }
+
+    public Mono<Void> changePassword(ChangePasswordRequest changePasswordRequest, Authentication authentication) {
+        UUID userId = UUID.fromString(this.getUserIdAndCustomerId(authentication).get("userId"));
+
+        return this.getObject(userId)
+                .<User>handle((user, sink) -> {
+                    if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
+                        sink.error(new RuntimeException("Old password is incorrect"));
+                        return;
+                    }
+                    sink.next(user);
+                })
+                .map(user -> {
+                    user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+                    return user;
+                }).then();
+    }
 }
