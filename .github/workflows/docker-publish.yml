@@ -28,12 +28,12 @@
             context: .
             dockerfile: Dockerfile
             push: false
-            tags: ${{ secrets.DOCKER_HUB_USERNAME }}/leasing:latest
+            tags: ${{ secrets.DOCKER_REGISTRY_HOST }}/leasing:latest
 
         - name: login to private registry
           uses: docker/login-action@v3
           with:
-            registry: docker.ilkerkocatepe.com.tr
+            registry: ${{ secrets.DOCKER_REGISTRY_HOST }}
             username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
             password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
 
