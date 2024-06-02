@@ -43,7 +43,7 @@
             context: .
             dockerfile: Dockerfile
             push: true
-            tags: ilkerkocatepe/leasing:latest
+            tags: ${{ secrets.DOCKER_REGISTRY_HOST }}/leasing:latest
 
         - name: Deploy to VPS
           uses: appleboy/ssh-action@master
