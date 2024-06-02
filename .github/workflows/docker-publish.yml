@@ -52,6 +52,6 @@
             username: ${{ secrets.VPS_USER }}
             password: ${{ secrets.VPS_PASSWORD }}
             script: |
-              docker pull ilkerkocatepe/leasing:latest
+              docker pull docker.ilkerkocatepe.com.tr/leasing:latest
               cd /opt/docker/leasing-backend
               docker-compose up -d --build
