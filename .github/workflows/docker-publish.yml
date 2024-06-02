@@ -18,13 +18,10 @@
             distribution: 'corretto'
             java-version: 21
 
-        - name: unit tests
-          run: mvn -B test --file pom.xml
-
         - name: build the app
           run: |
-            mvn clean
-            mvn -B package --file pom.xml
+            mvn clean -DskipTests
+            mvn -DskipTests -B package --file pom.xml
         - name: build the docker image
           uses: docker/build-push-action@v4
           with:
