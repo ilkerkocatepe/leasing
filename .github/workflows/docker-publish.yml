@@ -2,8 +2,6 @@
   on:
     push:
       branches: [ "main" ]
-    pull_request:
-      branches: [ "main" ]
 
   jobs:
     build-deploy:
@@ -20,9 +18,6 @@
             java-version: 21
 
         - name: build the app
-          run: |
-            mvn clean -DskipTests
-            mvn -DskipTests -B package --file pom.xml
           env:
             SERVER_PORT: ${{ secrets.SERVER_PORT }}
             POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
@@ -41,6 +36,8 @@
             MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
             MINIO_BUCKET_NAME: ${{ secrets.MINIO_BUCKET_NAME }}
             MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+          run: mvn clean -DskipTests -B package --file pom.xml
+
         - name: build the docker image
           uses: docker/build-push-action@v4
           with:
