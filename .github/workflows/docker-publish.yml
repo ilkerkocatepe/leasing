@@ -1,8 +1,7 @@
   name: build and deploy leasing
   on:
     push:
-      branches:
-        - main
+      branches: [ "main" ]
 
   jobs:
     build-deploy:
@@ -19,9 +18,26 @@
             java-version: 21
 
         - name: build the app
-          run: |
-            mvn clean -DskipTests
-            mvn -DskipTests -B package --file pom.xml
+          env:
+            SERVER_PORT: ${{ secrets.SERVER_PORT }}
+            POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+            POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+            POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+            POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+            POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+            HOST: ${{ secrets.HOST }}
+            JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+            ACCOUNT_ACCESS_KEY_FROM_AWS: ${{ secrets.ACCOUNT_ACCESS_KEY_FROM_AWS }}
+            ACCOUNT_SECRET_KEY_FROM_AWS: ${{ secrets.ACCOUNT_SECRET_KEY_FROM_AWS }}
+            S3_CONFIGURED_REGION_FROM_AWS: ${{ secrets.S3_CONFIGURED_REGION_FROM_AWS }}
+            S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+            S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+            MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+            MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+            MINIO_BUCKET_NAME: ${{ secrets.MINIO_BUCKET_NAME }}
+            MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+          run: mvn clean -DskipTests -B package --file pom.xml
+
         - name: build the docker image
           uses: docker/build-push-action@v4
           with:
