@@ -1,7 +1,12 @@
 INSERT INTO "customers" ("id", "created_at", "updated_at", "title", "logo", "tax_number", "tax_administration",
                          "mersis_number", "phone_number", "is_dealer")
-VALUES ('1ad58199-d546-425c-913d-c783b89b64e1', '2023-12-13 20:43:42.309602', '2023-12-13 20:43:42.309602',
-        'Karadeniz İskele', 'karadeniziskele.png', '5090583923', 'Çekirge Vergi Dairesi Müd.', '123456789123', '4448541', true);
+VALUES ('c252576c-a038-4881-b405-c2856ef59873', '2023-12-13 20:43:42.309602', '2023-12-13 20:43:42.309602',
+        'Admin Account', 'admin.png', '12423523421', 'Maltepe Vergi Dairesi Müd.', '534512343', '5305812850', true),
+       ('1ad58199-d546-425c-913d-c783b89b64e1', '2023-12-13 20:43:42.309602', '2023-12-13 20:43:42.309602',
+        'Karadeniz İskele', 'karadeniziskele.png', '5090583923', 'Çekirge Vergi Dairesi Müd.', '123456789123',
+        '4448541', true),
+       ('ec9b9c6a-b639-49de-9b19-8edc59f40ebd', '2023-12-13 20:43:42.309602', '2023-12-13 20:43:42.309602',
+        'Bay İskele', 'bayiskele.png', '509012432521', 'Küçükyalı Vergi Dairesi Müd.', '534623412', '432531243', true);
 
 INSERT INTO "customers" ("id", "created_at", "updated_at", "title", "logo", "tax_number", "tax_administration",
                          "mersis_number", "phone_number", "is_dealer")
@@ -26,9 +31,9 @@ VALUES ('eac90d51-2ef4-4202-8f69-01f303b4259e', '2024-01-21 22:54:25.004518', '2
         'Örnek Şantiye', 'örnek şantiye', 'Maltepe', 'İstanbul', 'Türkiye', '34852', 'burası şantiye', 'f',
         '7346ff0e-65aa-442c-a07a-3b0b3651f7d4');
 
-INSERT INTO "product_categories" ("id", "created_at", "updated_at", "name", "image")
+INSERT INTO "product_categories" ("id", "created_at", "updated_at", "name", "image", "customer_id")
 VALUES ('0fac08b9-9ad2-443b-9b53-e0b5e3ae40d6', '2023-12-14 00:52:34.491375', '2023-12-14 00:52:34.491375',
-        'Yatay Eleman', NULL);
+        'Yatay Eleman', NULL, '1ad58199-d546-425c-913d-c783b89b64e1');
 
 INSERT INTO "products" ("id", "created_at", "updated_at", "name", "image", "price", "factor", "unit", "category_id",
                         "customer_id")
@@ -59,12 +64,15 @@ VALUES ('d14cc303-c9a5-436d-b7ba-4f88f281e857', '2023-12-23 01:53:03.437155', 'I
         '54160792-9ad3-4d22-b401-bf60331883eb', 'aaef073c-cc9f-4b75-9a06-b8b731377c82');
 
 INSERT INTO "users" ("id", "created_at", "updated_at", "name", "email", "password", "active", "roles")
-VALUES ('5f1dbabd-2392-4b46-a416-649b3a640d53', '2024-01-28 16:37:43.276574', '2024-01-28 16:37:43.276574',
+VALUES ('a4c9d089-ddae-4121-b410-d313bdd9a3f7', '2024-01-28 16:37:43.352835', '2024-01-28 16:37:43.352835',
+        'admin', 'admin@admin.com', '{bcrypt}$2a$10$xJyPegfXXcRNpzewt3WMS.5rAgMCgduvcE7Ns3NO/Uq5gx1wJfYYS', 't',
+        '{CUSTOMER,DEALER,ADMIN}'),
+       ('5f1dbabd-2392-4b46-a416-649b3a640d53', '2024-01-28 16:37:43.276574', '2024-01-28 16:37:43.276574',
         'user', 'info@karadeniziskele.com', '{bcrypt}$2a$10$xJyPegfXXcRNpzewt3WMS.5rAgMCgduvcE7Ns3NO/Uq5gx1wJfYYS', 't',
         '{CUSTOMER,DEALER}'),
-       ('a4c9d089-ddae-4121-b410-d313bdd9a3f7', '2024-01-28 16:37:43.352835', '2024-01-28 16:37:43.352835',
-        'admin', 'admin@admin.com', '{bcrypt}$2a$10$m3V6uz/MDuLUFthQJBBYJ.1Vo72uLsyQM7K2gYJbK8lbHaPDV1yym', 't',
-        '{CUSTOMER,DEALER,ADMIN}');
+       ('087dcb1e-2d6e-44f1-97d5-dab2f112727e', '2024-01-28 16:37:43.352835', '2024-01-28 16:37:43.352835',
+        'bayiskele', 'info@bayiskele.com', '{bcrypt}$2a$10$xJyPegfXXcRNpzewt3WMS.5rAgMCgduvcE7Ns3NO/Uq5gx1wJfYYS', 't',
+        '{CUSTOMER,DEALER}');
 
 INSERT INTO "customer_preferences" ("id", "created_at", "updated_at", "name", "value", "description", "customer_id")
 VALUES ('1b10cda6-1f1b-4e28-9c6e-63a4ad2c1bf8', '2024-01-23 22:35:57.766619', '2024-01-23 22:35:57.766619',
@@ -78,15 +86,19 @@ INSERT INTO "contracts" ("id", "created_at", "updated_at", "contract_number", "s
                          "special_area_price", "seller_customer_id", "taker_customer_id", "user_id", "address_id")
 VALUES ('e8c8209f-1857-4160-a98d-799a0232b359', '2024-01-21 23:15:28.992173', '2024-01-21 23:15:28.992173', 'KI2801',
         'PREPARING', '2024-01-21 19:38:05.408', NULL, 30, '1ad58199-d546-425c-913d-c783b89b64e1',
-        '7346ff0e-65aa-442c-a07a-3b0b3651f7d4', '5f1dbabd-2392-4b46-a416-649b3a640d53', 'eac90d51-2ef4-4202-8f69-01f303b4259e'),
+        '7346ff0e-65aa-442c-a07a-3b0b3651f7d4', '5f1dbabd-2392-4b46-a416-649b3a640d53',
+        'eac90d51-2ef4-4202-8f69-01f303b4259e'),
        ('dde21739-1bc0-43ff-9fed-01cf1a2e3740', '2024-01-21 23:18:21.305428', '2024-01-21 23:18:21.305428', 'KI2801',
         'PREPARING', '2024-01-21 19:38:05.408', NULL, 30, '1ad58199-d546-425c-913d-c783b89b64e1',
-        '7346ff0e-65aa-442c-a07a-3b0b3651f7d4', '5f1dbabd-2392-4b46-a416-649b3a640d53', 'eac90d51-2ef4-4202-8f69-01f303b4259e'),
+        '7346ff0e-65aa-442c-a07a-3b0b3651f7d4', '5f1dbabd-2392-4b46-a416-649b3a640d53',
+        'eac90d51-2ef4-4202-8f69-01f303b4259e'),
        ('6b372803-22ee-48e4-9f0f-ce449a303eaf', '2024-01-21 23:48:19.735429', '2024-01-21 23:48:19.735429', 'KI2801',
         'ACTIVE', '2024-01-21 19:38:05.408', NULL, 30, '1ad58199-d546-425c-913d-c783b89b64e1',
-        '7346ff0e-65aa-442c-a07a-3b0b3651f7d4', '5f1dbabd-2392-4b46-a416-649b3a640d53', 'eac90d51-2ef4-4202-8f69-01f303b4259e');
+        '7346ff0e-65aa-442c-a07a-3b0b3651f7d4', '5f1dbabd-2392-4b46-a416-649b3a640d53',
+        'eac90d51-2ef4-4202-8f69-01f303b4259e');
 
-INSERT INTO "transactions" ("id", "created_at", "updated_at", "receipt_number", "type", "amount", "description", "issue_date", "contract_id", "product_id")
+INSERT INTO "transactions" ("id", "created_at", "updated_at", "receipt_number", "type", "amount", "description",
+                            "issue_date", "contract_id", "product_id")
 VALUES ('f45f182a-278e-4b14-946a-3d8a038d880c', '2024-01-21 23:15:29.046475', '2024-01-21 23:15:29.046475', 'KRA23-135',
         'OUTBOUND', 150, 'örnek', '2024-01-22 19:38:05.408', 'e8c8209f-1857-4160-a98d-799a0232b359',
         'caeb60ff-e54a-4948-bba9-1c94b0ea4d74'),
@@ -123,4 +135,6 @@ VALUES ('6b372803-22ee-48e4-9f0f-ce449a303eaf', '87956ed9-6c11-42a5-9736-cb03953
        ('6b372803-22ee-48e4-9f0f-ce449a303eaf', 'e511d78c-4932-49b6-9980-2946dca65053');
 
 INSERT INTO "customer_users" ("customer_id", "user_id")
-VALUES ('1ad58199-d546-425c-913d-c783b89b64e1', '5f1dbabd-2392-4b46-a416-649b3a640d53');
+VALUES ('c252576c-a038-4881-b405-c2856ef59873', 'a4c9d089-ddae-4121-b410-d313bdd9a3f7'),
+       ('1ad58199-d546-425c-913d-c783b89b64e1', '5f1dbabd-2392-4b46-a416-649b3a640d53'),
+       ('ec9b9c6a-b639-49de-9b19-8edc59f40ebd', '087dcb1e-2d6e-44f1-97d5-dab2f112727e');

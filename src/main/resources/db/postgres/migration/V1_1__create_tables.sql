@@ -46,11 +46,12 @@ CREATE TABLE if not exists customer_preferences
 
 CREATE TABLE if not exists product_categories
 (
-    id         UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
-    created_at TIMESTAMP    NOT NULL,
-    updated_at TIMESTAMP    NOT NULL DEFAULT NOW(),
-    name       VARCHAR(255) NOT NULL,
-    image      VARCHAR(255)
+    id          UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
+    created_at  TIMESTAMP    NOT NULL,
+    updated_at  TIMESTAMP    NOT NULL DEFAULT NOW(),
+    name        VARCHAR(255) NOT NULL,
+    image       VARCHAR(255),
+    customer_id UUID         NOT NULL REFERENCES customers (id)
 );
 
 CREATE TABLE if not exists products

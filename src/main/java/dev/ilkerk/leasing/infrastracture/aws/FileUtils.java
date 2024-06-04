@@ -20,6 +20,7 @@ public class FileUtils {
     private boolean isValidType(final FilePart filePart) {
         return true;
     }
+
     private boolean isEmpty(final FilePart filePart) {
         return StringUtils.isEmpty(filePart.filename())
                 && ObjectUtils.isEmpty(filePart.headers().getContentType());

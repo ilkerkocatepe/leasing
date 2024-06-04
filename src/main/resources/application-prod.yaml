@@ -19,3 +19,9 @@ ACCOUNT_SECRET_KEY_FROM_AWS: yj+tsmZTdCWA/P5oIJSu3i0FVc76/F1dON83YFnS
 S3_CONFIGURED_REGION_FROM_AWS: us-east-1
 S3_BUCKET_NAME: platform-leasing
 S3_ENDPOINT: https://platform-leasing.s3.amazonaws.com/
+
+## MINIO
+MINIO_ACCESS_KEY: sz57lB8PdD1EX0Y5GwLa
+MINIO_SECRET_KEY: 2Wy5sxMmOXzzKhpxqOLbZu25TIrfmTkndQfKppqF
+MINIO_BUCKET_NAME: leasing
+MINIO_ENDPOINT: http://localhost:9000/

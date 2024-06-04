@@ -60,11 +60,11 @@ public class ProductCategoryService {
 	}
 
 	public Mono<ProductCategoryResponse> create(ProductCategoryCreateDTO productCategoryCreateDTO) {
-		log.info("ProductCategory creating: " + productCategoryCreateDTO.toString());
+        log.info("ProductCategory creating: {}", productCategoryCreateDTO.toString());
 
 		ProductCategory productCategory = modelMapper.map(productCategoryCreateDTO, ProductCategory.class);
 
-		log.debug("Created productCategory object: " + productCategory);
+        log.debug("Created productCategory object: {}", productCategory);
 
 		return productCategoryRepository.save(productCategory).flatMap(productCategory1 -> {
 			ProductCategoryResponse productCategoryResponse = modelMapper.map(productCategory1, ProductCategoryResponse.class);
@@ -78,7 +78,7 @@ public class ProductCategoryService {
 	}
 
 	public Mono<ProductCategoryResponse> update(UUID id, ProductCategoryCreateDTO productCategoryCreateDTO) {
-		log.info("ProductCategory updating: " + productCategoryCreateDTO.toString());
+        log.info("ProductCategory updating: {}", productCategoryCreateDTO.toString());
 
 		return this.getObject(id)
 				.map(Optional::of)
@@ -111,13 +111,13 @@ public class ProductCategoryService {
 			productCategory.setImage(productCategoryCreateDTO.getImage());
 		}
 
-		log.info("Updated productHistory object: " + productCategory);
+        log.info("Updated productHistory object: {}", productCategory);
 
 		return productCategory;
 	}
 
 	public Mono<Void> deleteById(UUID id) {
-		log.info("ProductCategory deleting: " + id);
+        log.info("ProductCategory deleting: {}", id);
 
 		return productCategoryRepository.deleteById(id);
 	}

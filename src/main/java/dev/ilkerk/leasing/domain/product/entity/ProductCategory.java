@@ -26,4 +26,5 @@ public class ProductCategory {
     private LocalDateTime updatedAt;
     private String name;
     private String image;
+    private UUID customerId;
 }

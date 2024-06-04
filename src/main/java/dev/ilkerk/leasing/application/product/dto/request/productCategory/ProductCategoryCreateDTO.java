@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -17,4 +19,5 @@ public class ProductCategoryCreateDTO {
 	private String name;
 	@NotBlank(message = "Image is mandatory")
 	private String image;
+	private UUID customerId;
 }

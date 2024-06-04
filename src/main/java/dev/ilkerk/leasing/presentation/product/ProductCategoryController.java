@@ -8,10 +8,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -35,8 +37,9 @@ public class ProductCategoryController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public Flux<ProductCategoryResponse> getAll(@ModelAttribute @Valid ProductCategoryFindDTO productCategoryFindDTO) {
+	public Flux<ProductCategoryResponse> getAll(Authentication authentication, @ModelAttribute @Valid ProductCategoryFindDTO productCategoryFindDTO) {
 		try {
+			productCategoryFindDTO.setCustomerId(UUID.fromString(((Map<String, String>) authentication.getDetails()).get("customerId")));
 			return productCategoryService.getAllByCriteria(productCategoryFindDTO);
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -47,8 +50,9 @@ public class ProductCategoryController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Mono<ProductCategoryResponse> create(@Valid @RequestBody ProductCategoryCreateDTO productCategoryCreateDTO) {
+	public Mono<ProductCategoryResponse> create(Authentication authentication, @Valid @RequestBody ProductCategoryCreateDTO productCategoryCreateDTO) {
 		try {
+			productCategoryCreateDTO.setCustomerId(UUID.fromString(((Map<String, String>) authentication.getDetails()).get("customerId")));
 			return productCategoryService.create(productCategoryCreateDTO);
 		} catch (Exception e) {
 			log.error(e.getMessage());

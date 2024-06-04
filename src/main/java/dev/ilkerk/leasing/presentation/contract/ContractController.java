@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -38,8 +39,9 @@ public class ContractController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public Flux<ContractResponse> getAll(@ModelAttribute @Valid ContractFindDTO contractFindDTO) {
+	public Flux<ContractResponse> getAll(Authentication authentication, @ModelAttribute @Valid ContractFindDTO contractFindDTO) {
 		try {
+			contractFindDTO.setSellerCustomerId(UUID.fromString(((Map<String, String>) authentication.getDetails()).get("customerId")));
 			return contractService.getAllByCriteria(contractFindDTO);
 		} catch (Exception e) {
 			log.error(e.getMessage());

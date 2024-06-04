@@ -19,10 +19,12 @@ import static org.springframework.data.domain.ExampleMatcher.matching;
 public class ProductCategoryFindDTO {
 	private UUID id;
 	private String name;
+	private UUID customerId;
 
 	public static ExampleMatcher getExampleMatcher() {
 		return matching()
 				.withMatcher("id", exact())
-				.withMatcher("name", contains().stringMatcher(ExampleMatcher.StringMatcher.CONTAINING).ignoreCase());
+				.withMatcher("name", contains().stringMatcher(ExampleMatcher.StringMatcher.CONTAINING).ignoreCase())
+				.withMatcher("customerId", exact());
 	}
 }

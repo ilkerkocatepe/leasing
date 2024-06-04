@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -31,7 +32,8 @@ public class AllowanceController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Flux<AllowanceResponse> getAll(@ModelAttribute @Valid AllowanceFind allowanceFind) {
+    public Flux<AllowanceResponse> getAll(Authentication authentication, @ModelAttribute @Valid AllowanceFind allowanceFind) {
+        allowanceFind.setCustomerId(UUID.fromString(((Map<String, String>) authentication.getDetails()).get("customerId")));
         return allowanceService.getAllByCriteria(allowanceFind);
     }
 

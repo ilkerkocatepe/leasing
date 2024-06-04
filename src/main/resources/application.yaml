@@ -57,3 +57,14 @@ aws:
   product-image-folder: ${aws.endpoint}${aws.bucket-name}/product/
   product-category-image-folder: ${aws.endpoint}${aws.bucket-name}/product-category/
   customer-image-folder: ${aws.endpoint}${aws.bucket-name}/customer/
+
+minio:
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  region: "" # Minio does not have a region
+  bucket-name: ${MINIO_BUCKET_NAME}
+  endpoint: ${MINIO_ENDPOINT}
+  multipart-min-part-size: 5242880 # 5MB
+  product-image-folder: ${minio.endpoint}${minio.bucket-name}/product/
+  product-category-image-folder: ${minio.endpoint}${minio.bucket-name}/product-category/
+  customer-image-folder: ${minio.endpoint}${minio.bucket-name}/customer/

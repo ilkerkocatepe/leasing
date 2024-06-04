@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -36,8 +37,9 @@ public class ProductController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public Flux<ProductResponse> getAll(@ModelAttribute @Valid ProductFindDTO productFindDTO) {
+	public Flux<ProductResponse> getAll(Authentication authentication, @ModelAttribute @Valid ProductFindDTO productFindDTO) {
 		try {
+			productFindDTO.setCustomerId(UUID.fromString(((Map<String, String>) authentication.getDetails()).get("customerId")));
 			return productService.getAllByCriteria(productFindDTO);
 		} catch (Exception e) {
 			log.error(e.getMessage());
