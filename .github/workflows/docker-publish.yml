@@ -72,4 +72,5 @@
             password: ${{ secrets.VPS_PASSWORD }}
             script: |
               cd /opt/docker/leasing-backend
-              docker-compose up -d --build
+              docker compose down
+              docker compose up -d --build
