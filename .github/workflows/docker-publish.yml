@@ -1,7 +1,7 @@
   name: build and deploy leasing
   on:
     push:
-      branches: [ "main" ]
+      branches: [ "main", "dev" ]
 
   jobs:
     build-deploy:
@@ -53,13 +53,31 @@
             username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
             password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
 
-        - name: push the docker image to docker hub
-          uses: docker/build-push-action@v4
+        - name: push the docker image to docker registry
+          uses: docker/build-push-action@v5
           with:
             context: .
             dockerfile: Dockerfile
             push: true
             tags: ${{ secrets.DOCKER_REGISTRY_HOST }}/leasing:latest
+            secrets: |
+              "SERVER_PORT= ${{ secrets.SERVER_PORT }}"
+              "POSTGRES_URL= ${{ secrets.POSTGRES_URL }}"
+              "POSTGRES_PORT= ${{ secrets.POSTGRES_PORT }}"
+              "POSTGRES_DB= ${{ secrets.POSTGRES_DB }}"
+              "POSTGRES_USER= ${{ secrets.POSTGRES_USER }}"
+              "POSTGRES_PASSWORD= ${{ secrets.POSTGRES_PASSWORD }}"
+              "HOST= ${{ secrets.HOST }}"
+              "JWT_SECRET_KEY= ${{ secrets.JWT_SECRET_KEY }}"
+              "ACCOUNT_ACCESS_KEY_FROM_AWS= ${{ secrets.ACCOUNT_ACCESS_KEY_FROM_AWS }}"
+              "ACCOUNT_SECRET_KEY_FROM_AWS= ${{ secrets.ACCOUNT_SECRET_KEY_FROM_AWS }}"
+              "S3_CONFIGURED_REGION_FROM_AWS= ${{ secrets.S3_CONFIGURED_REGION_FROM_AWS }}"
+              "S3_BUCKET_NAME= ${{ secrets.S3_BUCKET_NAME }}"
+              "S3_ENDPOINT= ${{ secrets.S3_ENDPOINT }}"
+              "MINIO_ACCESS_KEY= ${{ secrets.MINIO_ACCESS_KEY }}"
+              "MINIO_SECRET_KEY= ${{ secrets.MINIO_SECRET_KEY }}"
+              "MINIO_BUCKET_NAME= ${{ secrets.MINIO_BUCKET_NAME }}"
+              "MINIO_ENDPOINT= ${{ secrets.MINIO_ENDPOINT }}"
 
         - name: Deploy to VPS
           uses: appleboy/ssh-action@master
@@ -69,5 +87,5 @@
             password: ${{ secrets.VPS_PASSWORD }}
             script: |
               cd /opt/docker/leasing-backend
-              docker compose down
-              docker compose up -d --build
+              docker compose down leasing
+              docker compose up -d --build leasing
