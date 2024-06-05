@@ -1,6 +1,5 @@
 # Stage 1: Build the Spring Boot JAR
 FROM maven:3.9.6-ibm-semeru-21-jammy AS build
-WORKDIR /app
 
 RUN --mount=type=secret,id=SERVER_PORT \
     cat /run/secrets/SERVER_PORT
@@ -37,6 +36,7 @@ RUN --mount=type=secret,id=MINIO_BUCKET_NAME \
 RUN --mount=type=secret,id=MINIO_ENDPOINT \
     cat /run/secrets/MINIO_ENDPOINT
 
+WORKDIR /app
 
 # Copy the project's POM file and download dependencies
 COPY pom.xml .
