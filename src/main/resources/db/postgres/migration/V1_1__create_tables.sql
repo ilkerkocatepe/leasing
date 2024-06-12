@@ -27,6 +27,7 @@ CREATE TABLE if not exists customers
     mersis_number      VARCHAR(255),
     phone_number       VARCHAR(255),
     is_dealer          BOOLEAN      NOT NULL DEFAULT FALSE,
+    parent_customer_id UUID         REFERENCES customers (id)
     CONSTRAINT tax_number_unique UNIQUE (tax_number)
 );
 

@@ -1,17 +1,17 @@
 INSERT INTO "customers" ("id", "created_at", "updated_at", "title", "logo", "tax_number", "tax_administration",
-                         "mersis_number", "phone_number", "is_dealer")
+                         "mersis_number", "phone_number", "is_dealer", "parent_customer_id")
 VALUES ('c252576c-a038-4881-b405-c2856ef59873', '2023-12-13 20:43:42.309602', '2023-12-13 20:43:42.309602',
-        'Admin Account', 'admin.png', '12423523421', 'Maltepe Vergi Dairesi Müd.', '534512343', '5305812850', true),
+        'Admin Account', 'admin.png', '12423523421', 'Maltepe Vergi Dairesi Müd.', '534512343', '5305812850', true, null),
        ('1ad58199-d546-425c-913d-c783b89b64e1', '2023-12-13 20:43:42.309602', '2023-12-13 20:43:42.309602',
         'Karadeniz İskele', 'karadeniziskele.png', '5090583923', 'Çekirge Vergi Dairesi Müd.', '123456789123',
-        '4448541', true),
+        '4448541', true, null),
        ('ec9b9c6a-b639-49de-9b19-8edc59f40ebd', '2023-12-13 20:43:42.309602', '2023-12-13 20:43:42.309602',
-        'Bay İskele', 'bayiskele.png', '509012432521', 'Küçükyalı Vergi Dairesi Müd.', '534623412', '432531243', true);
+        'Bay İskele', 'bayiskele.png', '509012432521', 'Küçükyalı Vergi Dairesi Müd.', '534623412', '432531243', true, null);
 
 INSERT INTO "customers" ("id", "created_at", "updated_at", "title", "logo", "tax_number", "tax_administration",
-                         "mersis_number", "phone_number", "is_dealer")
+                         "mersis_number", "phone_number", "is_dealer", "parent_customer_id")
 VALUES ('7346ff0e-65aa-442c-a07a-3b0b3651f7d4', '2023-12-14 20:12:37.323683', '2023-12-14 20:12:37.323683',
-        'Örnek İnşaat', NULL, '456789123852', 'Küçükyalı', '84576893472039', '05321112233', false);
+        'Örnek İnşaat', NULL, '456789123852', 'Küçükyalı', '84576893472039', '05321112233', false, "c252576c-a038-4881-b405-c2856ef59873");
 
 INSERT INTO "addresses" ("id", "created_at", "updated_at", "name", "details", "district", "city", "country", "zipcode",
                          "description", "customer_id", "is_main")

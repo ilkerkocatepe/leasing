@@ -31,4 +31,5 @@ public class Customer {
     private String mersisNumber;
     private String phoneNumber;
     private Boolean isDealer = false;
+    private UUID parentCustomerId;
 }
