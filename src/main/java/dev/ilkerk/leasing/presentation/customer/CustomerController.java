@@ -10,10 +10,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -37,8 +39,9 @@ public class CustomerController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public Flux<CustomerResponse> getAll(@ModelAttribute @Valid CustomerFindDTO customerFindDTO) {
+	public Flux<CustomerResponse> getAll(Authentication authentication, @ModelAttribute @Valid CustomerFindDTO customerFindDTO) {
 		try {
+			customerFindDTO.setParentCustomerId(UUID.fromString(((Map<String, String>) authentication.getDetails()).get("customerId")));
 			return customerService.getAllByCriteria(customerFindDTO);
 		} catch (Exception e) {
 			log.error(e.getMessage());

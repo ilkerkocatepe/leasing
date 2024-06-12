@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.ExampleMatcher;
 
+import java.util.UUID;
+
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.contains;
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.exact;
 import static org.springframework.data.domain.ExampleMatcher.matching;
@@ -20,6 +22,7 @@ public class CustomerFindDTO {
 	private String taxAdministration;
 	private String mersisNumber;
 	private String phoneNumber;
+	private UUID parentCustomerId;
 
 	public static ExampleMatcher getExampleMatcher() {
 		return matching()
@@ -29,6 +32,7 @@ public class CustomerFindDTO {
 				.withMatcher("taxAdministration", contains().stringMatcher(ExampleMatcher.StringMatcher.CONTAINING).ignoreCase())
 				.withMatcher("mersisNumber", contains().stringMatcher(ExampleMatcher.StringMatcher.CONTAINING).ignoreCase())
 				.withMatcher("phoneNumber", contains().stringMatcher(ExampleMatcher.StringMatcher.CONTAINING).ignoreCase())
-				.withMatcher("isDealer", exact());
+				.withMatcher("isDealer", exact())
+				.withMatcher("parentCustomerId", exact());
 	}
 }
