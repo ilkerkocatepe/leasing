@@ -11,7 +11,7 @@ VALUES ('c252576c-a038-4881-b405-c2856ef59873', '2023-12-13 20:43:42.309602', '2
 INSERT INTO "customers" ("id", "created_at", "updated_at", "title", "logo", "tax_number", "tax_administration",
                          "mersis_number", "phone_number", "is_dealer", "parent_customer_id")
 VALUES ('7346ff0e-65aa-442c-a07a-3b0b3651f7d4', '2023-12-14 20:12:37.323683', '2023-12-14 20:12:37.323683',
-        'Örnek İnşaat', NULL, '456789123852', 'Küçükyalı', '84576893472039', '05321112233', false, "c252576c-a038-4881-b405-c2856ef59873");
+        'Örnek İnşaat', NULL, '456789123852', 'Küçükyalı', '84576893472039', '05321112233', false, 'c252576c-a038-4881-b405-c2856ef59873');
 
 INSERT INTO "addresses" ("id", "created_at", "updated_at", "name", "details", "district", "city", "country", "zipcode",
                          "description", "customer_id", "is_main")
